@@ -1,0 +1,65 @@
+﻿<Window x:Class="DonutMessager.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DonutMessager.Views"
+        mc:Ignorable="d"
+        Title="Login" Height="500" Width="800" MinWidth="800" MinHeight="500" MaxWidth="800" MaxHeight="500">
+    <Grid Width="800" Height="500" MinWidth="800" MinHeight="500" MaxWidth="800" MaxHeight="500">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FFF86CFF"/>
+                <GradientStop Color="#FF5D395F" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Rectangle HorizontalAlignment="Left" Height="73" Margin="201,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="10" RadiusY="10"/>
+
+        <Rectangle HorizontalAlignment="Left" Height="135" Margin="201,126,0,0" Stroke="White" VerticalAlignment="Top" Width="418" Fill="White" RadiusX="10" RadiusY="10"/>
+
+        <Rectangle HorizontalAlignment="Left" Height="48" Margin="200,356,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="13" RadiusY="13"/>
+
+        <Label x:Name="Label" Content="Let's beginn!" HorizontalAlignment="Left" Height="97" Margin="168,10,0,0" VerticalAlignment="Top" Width="484" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60"/>
+        <Label x:Name="Label_Copy" Content="Pick one of your accounts" HorizontalAlignment="Left" Height="28" Margin="201,95,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18"/>
+        <Label x:Name="Label_Copy1" Content="or" HorizontalAlignment="Left" Height="28" Margin="201,307,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18"/>
+        <Button x:Name="RegButton" Content="REGISTER A NEW ACCOUNT" HorizontalAlignment="Left" Height="48" Margin="201,356,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" FontSize="22" Background="{x:Null}" BorderBrush="{x:Null}" Command="{Binding CreateUserCommand}"/>
+        <Button Content="LOGIN"
+        Command="{Binding LoginCommand}"
+        HorizontalAlignment="Left"
+        Margin="201,261,0,198"
+        Width="418"
+        FontFamily="Arial Black"
+        FontSize="22"
+        BorderBrush="{x:Null}" Background="#00DDDDDD"/>
+        <ListBox HorizontalAlignment="Left"
+         Height="113"
+         Margin="214,137,0,0"
+         VerticalAlignment="Top"
+         Width="392"
+         ItemsSource="{Binding Users}"
+         SelectedItem="{Binding SelectedUser}"
+         Background="{x:Null}"
+         BorderBrush="{x:Null}"
+         MouseDoubleClick="ListBox_MouseDoubleClick">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Border Width="40" Height="40" CornerRadius="20" ClipToBounds="True">
+                            <Image Source="{Binding AvatarPath, TargetNullValue=/Images/default_avatar.png}"
+                                   Stretch="UniformToFill"/>
+                        </Border>
+
+                        <TextBlock Text="{Binding Username}"
+                           VerticalAlignment="Center"
+                           Margin="10,0,0,0"
+                           FontFamily="Arial Black"
+                           FontSize="18"
+                           Foreground="Black"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>

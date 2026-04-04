@@ -1,0 +1,277 @@
+﻿<Window x:Class="DonutMessager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DonutMessager.Converters"
+        xmlns:conv="clr-namespace:DonutMessager.Converters"
+        Title="Donut Messenger" Height="600" Width="900">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <local:InverseBooleanToVisibilityConverter x:Key="BoolToVisibilityInverse"/>
+        <conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <conv:NotNullToCollapsedConverter x:Key="NotNullToCollapsedConverter"/>
+    </Window.Resources>
+
+
+    <Grid>
+
+        <!-- 🖼️ Твой фон -->
+        <Grid.Background>
+            <ImageBrush ImageSource="/Gemini_Generated_Image_f0p71df0p71df0p7.png"
+                        Stretch="UniformToFill"
+                        Opacity="1"/>
+        </Grid.Background>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
+        <Rectangle Margin="589,525,0,0" Stroke="Black" Fill="#D8B573C1" RadiusX="50" RadiusY="50" Grid.Column="1" Height="49" VerticalAlignment="Top" HorizontalAlignment="Left" Width="51"/>
+
+        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
+        <Rectangle HorizontalAlignment="Left" Height="45" Margin="10,529,0,0" Stroke="#FFF87DFF" VerticalAlignment="Top" Width="579" Fill="#D30E0E0E" RadiusX="10" RadiusY="10" Grid.Column="1"/>
+        <Rectangle HorizontalAlignment="Center" Height="446" Stroke="Black" VerticalAlignment="Center" Width="640" RadiusX="10" RadiusY="15" Grid.Column="1">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="#FF6D4468" Offset="1"/>
+                    <GradientStop Color="#D6332130" Offset="0.777"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
+        <Border Background="#FF100F0F" Opacity="0.85" BorderBrush="#333" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Заголовок -->
+                    <RowDefinition Height="*"/>
+                    <!-- Контакты -->
+                    <RowDefinition Height="70"/>
+                    <!-- Текущий пользователь -->
+                </Grid.RowDefinitions>
+
+                <!-- Заголовок -->
+                <TextBlock Text="Contacts"
+                   FontSize="20"
+                   Foreground="White"
+                   Margin="15,10"/>
+
+                <!-- Контакты -->
+                <Grid Grid.Row="1">
+
+                    <!-- Список контактов -->
+                    <ListBox ItemsSource="{Binding Contacts}"
+                     SelectedItem="{Binding SelectedContact}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Foreground="White"
+                     Padding="10"
+                     Visibility="{Binding Contacts.Count, Converter={StaticResource CountToVisibilityConverter}}">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,8">
+                                    <Ellipse Width="40" Height="40" Margin="0,0,10,0">
+                                        <Ellipse.Fill>
+                                            <ImageBrush ImageSource="{Binding AvatarPath, TargetNullValue=/Images/default_avatar.png}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding Name}"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       Foreground="White"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Если контактов нет -->
+                    <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding Contacts.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                        <TextBlock Text="nobody but us!"
+                           FontFamily="Arial Black"
+                           FontSize="24"
+                           Foreground="White"
+                           HorizontalAlignment="Center"/>
+
+                        <Button Content="begin a discussion"
+                        Margin="0,20,0,0"
+                        Padding="20,10"
+                        Command="{Binding CreateContactCommand}" Background="Black" Foreground="White" BorderBrush="{x:Null}"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Текущий пользователь -->
+                <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="10"
+                    VerticalAlignment="Center">
+
+                    <Border Width="40" Height="40" CornerRadius="20" ClipToBounds="True">
+                        <Image Source="{Binding CurrentUser.AvatarPath, TargetNullValue=/Images/default_avatar.png}"
+                       Stretch="UniformToFill"/>
+                    </Border>
+
+                    <TextBlock Text="{Binding CurrentUser.Username}"
+                       VerticalAlignment="Center"
+                       Margin="10,0,0,0"
+                       FontFamily="Arial Black"
+                       FontSize="16"
+                       Foreground="White"/>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+
+
+        <!-- 🟩 ПРАВАЯ ПАНЕЛЬ -->
+        <Grid Grid.Column="1">
+
+            <TextBlock Text="Pick one to chat with!"
+               FontFamily="Arial Black"
+               FontSize="32"
+               Foreground="Gray"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Visibility="{Binding SelectedContact, Converter={StaticResource NullToVisibilityConverter}}"/>
+
+            <Grid Margin="10"
+          Visibility="{Binding SelectedContact, Converter={StaticResource NotNullToCollapsedConverter}}">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="53"/>
+                    <!-- Input -->
+                    <!-- Header -->
+                    <RowDefinition Height="*"/>
+                    <!-- Messages -->
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Opacity="0.85" CornerRadius="4,4,0,0" Padding="10">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="Black" Offset="1"/>
+                            <GradientStop Color="#FF9E6196" Offset="0"/>
+                            <GradientStop Color="#D6482F45" Offset="0.358"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="32" Height="32" Fill="#444"/>
+                        <StackPanel Margin="0,-2,0,0">
+                            <TextBlock Text="{Binding SelectedContact.Name}"
+                       Foreground="White"
+                       FontSize="16"
+                       FontWeight="Bold"/>
+                            <TextBlock Text="online"
+                       Foreground="#AAAAAA"
+                       FontSize="11"
+                       Margin="0,-2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                
+                
+                <!-- Messages -->
+                <Border Opacity="0.85" CornerRadius="0,0,4,4" Padding="10" Grid.Row="1" Margin="0,6,0,59" Grid.RowSpan="2">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Messages}" Foreground="Black" Width="598">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Чужое сообщение (слева, с аватаром) -->
+                                        <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Margin="0,0,40,0"
+                        Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibilityInverse}}">
+
+                                            <!-- Аватар -->
+                                            <Ellipse Width="32" Height="32">
+                                                <Ellipse.Fill>
+                                                    <ImageBrush ImageSource="{Binding AvatarPath, TargetNullValue=/Images/default_avatar.png}"/>
+                                                </Ellipse.Fill>
+                                            </Ellipse>
+
+                                            <!-- Пузырёк -->
+                                            <Border Background="#FFFFFF"
+                        CornerRadius="10,10,10,0"
+                        Padding="10"
+                        MaxWidth="350"
+                        Opacity="0.9">
+                                                <TextBlock Text="{Binding Text}"
+                               Foreground="Black"
+                               TextWrapping="Wrap"/>
+                                            </Border>
+                                        </StackPanel>
+
+                                        <!-- Моё сообщение (справа, без аватара) -->
+                                        <Border Grid.Column="1"
+                    Background="#4CAF50"
+                    CornerRadius="10,10,0,10"
+                    Padding="10"
+                    MaxWidth="350"
+                    Margin="40,0,0,0"
+                    Opacity="0.9"
+                    HorizontalAlignment="Right"
+                    Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibility}}">
+                                            <TextBlock Text="{Binding Text}"
+                           Foreground="White"
+                           TextWrapping="Wrap"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                </Border>
+
+                <!-- Input -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+
+                    <TextBox Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
+                         Foreground="Black"
+                         BorderBrush="#00CCCCCC"
+                         FontSize="14"
+                         Padding="10"
+                         Height="42"
+                         Width="576"
+                         Opacity="0.9" Background="Transparent" SelectionBrush="#FF6B4366" SelectionTextBrush="#FFFFCAFB"/>
+                    <Button Content=""
+        Command="{Binding SendMessageCommand}"
+        FontWeight="Bold"
+        Width="34"
+        Margin="10,0,0,0"
+        Height="34" RenderTransformOrigin="0.5,0.5" BorderBrush="#00707070">
+                        <Button.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleY="0"/>
+                                <RotateTransform/>
+                                <TranslateTransform Y="0"/>
+                            </TransformGroup>
+                        </Button.RenderTransform>
+                        <Button.Background>
+                            <ImageBrush ImageSource="/Gemini_Generated_Image_creu5ycreu5ycreu-removebg-preview.png" Stretch="UniformToFill" TileMode="None"/>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
