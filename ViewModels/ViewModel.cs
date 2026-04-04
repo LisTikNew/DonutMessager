@@ -1,7 +1,8 @@
 ﻿using DonutMessager;
 using DonutMessager.Helpers;
 using DonutMessager.Models;
-using Microsoft.EntityFrameworkCore;
+using DonutMessenger.Client.Services;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,137 +12,103 @@ using System.Windows.Input;
 
 public class MainViewModel : INotifyPropertyChanged
 {
+    public User CurrentUser { get; }
 
-    // -----------------------------
-    // 1. ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
-    // -----------------------------
-    public User CurrentUser { get; set; }
+    public ObservableCollection<ChatModel> Chats { get; set; } = new();
+    public ObservableCollection<MessageModel> Messages { get; set; } = new();
 
-    // -----------------------------
-    // 2. КОЛЛЕКЦИИ
-    // -----------------------------
-    public ObservableCollection<Contact> Contacts { get; set; } = new();
-    public ObservableCollection<Message> Messages { get; set; } = new();
-
-    // -----------------------------
-    // 3. ВЫБРАННЫЙ КОНТАКТ
-    // -----------------------------
-    private Contact _selectedContact;
-    public Contact SelectedContact
+    private ChatModel _selectedChat;
+    public ChatModel SelectedChat
     {
-        get => _selectedContact;
+        get => _selectedChat;
         set
         {
-            _selectedContact = value;
-            OnPropertyChanged();
-            LoadMessagesAsync();   // ← ШАГ 6 вызывается здесь
+            if (_selectedChat != value)
+            {
+                _selectedChat = value;
+                OnPropertyChanged();
+
+                LoadChatMessages();
+                JoinChatRoom();
+            }
         }
     }
 
-    // -----------------------------
-    // 4. ТЕКСТ ВВОДА
-    // -----------------------------
     private string _messageText;
     public string MessageText
     {
         get => _messageText;
-        set
-        {
-            _messageText = value;
-            OnPropertyChanged();
-        }
+        set { _messageText = value; OnPropertyChanged(); }
     }
 
-    // -----------------------------
-    // 5. КОМАНДА ОТПРАВКИ
-    // -----------------------------
     public ICommand SendMessageCommand { get; }
 
-    // -----------------------------
-    // 6. КОНСТРУКТОР
-    // -----------------------------
+    private readonly SignalRService _signalR;
+
     public MainViewModel(User user)
     {
         CurrentUser = user;
 
-        SendMessageCommand = new RelayCommand(SendMessage);
+        SendMessageCommand = new RelayCommand(async () => await SendMessage());
 
-        LoadContactsAsync();   // ← ШАГ 1
+        _signalR = new SignalRService("http://localhost:5227");
+        InitializeSignalR();
+
+        LoadChats();
     }
 
-    // -----------------------------
-    // 7. ЗАГРУЗКА КОНТАКТОВ
-    // -----------------------------
-    private async void LoadContactsAsync()
+    private async void InitializeSignalR()
     {
-        using var db = new AppDbContext();
-        var contacts = await db.Contacts.ToListAsync();
+        await _signalR.StartAsync();
 
-        Contacts.Clear();
-        foreach (var c in contacts)
-            Contacts.Add(c);
+        _signalR.Connection.On("ReceiveMessage",
+            (int chatId, int senderId, string text, DateTime timestamp) =>
+            {
+                if (SelectedChat != null && SelectedChat.Id == chatId)
+                {
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        Messages.Add(new MessageModel
+                        {
+                            ChatId = chatId,
+                            SenderId = senderId,
+                            Text = text,
+                            Timestamp = timestamp
+                        });
+                    });
+                }
+            });
     }
 
-    // -----------------------------
-    // 8. ЗАГРУЗКА СООБЩЕНИЙ (ШАГ 6)
-    // -----------------------------
-    private async void LoadMessagesAsync()
+    private async void LoadChats()
     {
-        if (SelectedContact == null)
+        // TODO: запрос на сервер /api/chat/{userId}/list
+    }
+
+    private async void LoadChatMessages()
+    {
+        if (SelectedChat == null) return;
+
+        // TODO: запрос на сервер /api/message/{chatId}/history
+    }
+
+    private async void JoinChatRoom()
+    {
+        if (SelectedChat != null)
+            await _signalR.JoinChat(SelectedChat.Id);
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(MessageText) || SelectedChat == null)
             return;
 
-        using var db = new AppDbContext();
-
-        var msgs = await db.Messages
-    .Where(m =>
-        (m.SenderId == CurrentUser.Id && m.ReceiverId == SelectedContact.Id) ||
-        (m.SenderId == SelectedContact.Id && m.ReceiverId == CurrentUser.Id))
-    .OrderBy(m => m.Timestamp)
-    .ToListAsync();
-
-        Messages.Clear();
-
-        foreach (var m in msgs)
-        {
-            m.IsMine = m.SenderId == CurrentUser.Id;
-
-            var sender = db.Users.First(u => u.Id == m.SenderId);
-            m.SenderAvatar = sender.AvatarPath;
-
-            Messages.Add(m);
-        }
-    }
-
-    // -----------------------------
-    // 9. ОТПРАВКА СООБЩЕНИЯ (ШАГ 7)
-    // -----------------------------
-    private async void SendMessage()
-    {
-        if (string.IsNullOrWhiteSpace(MessageText) || SelectedContact == null)
-            return;
-
-        var msg = new Message
-        {
-            SenderId = CurrentUser.Id,
-            ReceiverId = SelectedContact.Id,
-            Text = MessageText,
-            Timestamp = DateTime.Now,
-            IsMine = true
-        };
-
-        using var db = new AppDbContext();
-        db.Messages.Add(msg);
-        await db.SaveChangesAsync();
-
-        Messages.Add(msg);
+        await _signalR.SendMessage(SelectedChat.Id, CurrentUser.Id, MessageText);
 
         MessageText = "";
         OnPropertyChanged(nameof(MessageText));
     }
 
-    // -----------------------------
-    // 10. INotifyPropertyChanged
-    // -----------------------------
     public event PropertyChangedEventHandler PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
