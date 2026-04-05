@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DonutMessager.ViewModels
@@ -47,8 +48,13 @@ namespace DonutMessager.ViewModels
 
         private void Login()
         {
-            if (SelectedUser != null)
-                LoginSucceeded?.Invoke(SelectedUser);
+            if (SelectedUser == null)
+            {
+                MessageBox.Show("Выберите аккаунт!");
+                return;
+            }
+
+            LoginSucceeded?.Invoke(SelectedUser);
         }
 
         private void CreateUser()

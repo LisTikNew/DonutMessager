@@ -17,6 +17,8 @@ public class MainViewModel : INotifyPropertyChanged
     public ObservableCollection<ChatModel> Chats { get; set; } = new();
     public ObservableCollection<MessageModel> Messages { get; set; } = new();
 
+
+
     private ChatModel _selectedChat;
     public ChatModel SelectedChat
     {
@@ -48,6 +50,8 @@ public class MainViewModel : INotifyPropertyChanged
     public MainViewModel(User user)
     {
         CurrentUser = user;
+
+        MessageModel.CurrentUserId = CurrentUser.Id;
 
         SendMessageCommand = new RelayCommand(async () => await SendMessage());
 
@@ -82,7 +86,9 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void LoadChats()
     {
-        // TODO: запрос на сервер /api/chat/{userId}/list
+        Chats.Clear();
+        Chats.Add(new ChatModel { Id = 1, Title = "Test chat", AvatarUrl = "/Images/default_avatar.png" });
+        Chats.Add(new ChatModel { Id = 2, Title = "Another chat", AvatarUrl = "/Images/default_avatar.png" });
     }
 
     private async void LoadChatMessages()

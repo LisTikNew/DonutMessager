@@ -66,23 +66,23 @@
                 <Grid Grid.Row="1">
 
                     <!-- Список контактов -->
-                    <ListBox ItemsSource="{Binding Contacts}"
-                     SelectedItem="{Binding SelectedContact}"
-                     Background="Transparent"
-                     BorderThickness="0"
-                     Foreground="White"
-                     Padding="10"
-                     Visibility="{Binding Contacts.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                    <ListBox ItemsSource="{Binding Chats}"
+         SelectedItem="{Binding SelectedChat}"
+         Background="Transparent"   
+         BorderThickness="0"
+         Foreground="White"
+         Padding="10"
+         Visibility="{Binding Chats.Count, Converter={StaticResource CountToVisibilityConverter}}">
 
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="0,8">
                                     <Ellipse Width="40" Height="40" Margin="0,0,10,0">
                                         <Ellipse.Fill>
-                                            <ImageBrush ImageSource="{Binding AvatarPath, TargetNullValue=/Images/default_avatar.png}"/>
+                                            <ImageBrush ImageSource="{Binding AvatarUrl, TargetNullValue=/Images/default_avatar.png}"/>
                                         </Ellipse.Fill>
                                     </Ellipse>
-                                    <TextBlock Text="{Binding Name}"
+                                    <TextBlock Text="{Binding Title}"
                                        VerticalAlignment="Center"
                                        FontSize="16"
                                        Foreground="White"/>
@@ -94,17 +94,20 @@
                     <!-- Если контактов нет -->
                     <StackPanel HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Visibility="{Binding Contacts.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
+                        Visibility="{Binding Chats.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
                         <TextBlock Text="nobody but us!"
                            FontFamily="Arial Black"
                            FontSize="24"
                            Foreground="White"
                            HorizontalAlignment="Center"/>
 
+                        <!--
                         <Button Content="begin a discussion"
                         Margin="0,20,0,0"
                         Padding="20,10"
                         Command="{Binding CreateContactCommand}" Background="Black" Foreground="White" BorderBrush="{x:Null}"/>
+                        -->
+
                     </StackPanel>
 
                 </Grid>
@@ -116,7 +119,7 @@
                     VerticalAlignment="Center">
 
                     <Border Width="40" Height="40" CornerRadius="20" ClipToBounds="True">
-                        <Image Source="{Binding CurrentUser.AvatarPath, TargetNullValue=/Images/default_avatar.png}"
+                        <Image Source="{Binding CurrentUser.AvatarUrl, TargetNullValue=/Images/default_avatar.png}"
                        Stretch="UniformToFill"/>
                     </Border>
 
@@ -142,10 +145,11 @@
                Foreground="Gray"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
-               Visibility="{Binding SelectedContact, Converter={StaticResource NullToVisibilityConverter}}"/>
+               Visibility="{Binding SelectedChat, Converter={StaticResource NullToVisibilityConverter}}"/>
+
 
             <Grid Margin="10"
-          Visibility="{Binding SelectedContact, Converter={StaticResource NotNullToCollapsedConverter}}">
+          Visibility="{Binding SelectedChat, Converter={StaticResource NotNullToCollapsedConverter}}">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="53"/>
@@ -168,7 +172,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="32" Height="32" Fill="#444"/>
                         <StackPanel Margin="0,-2,0,0">
-                            <TextBlock Text="{Binding SelectedContact.Name}"
+                            <TextBlock Text="{Binding SelectedChat.Title}"
                        Foreground="White"
                        FontSize="16"
                        FontWeight="Bold"/>
@@ -203,7 +207,7 @@
                                             <!-- Аватар -->
                                             <Ellipse Width="32" Height="32">
                                                 <Ellipse.Fill>
-                                                    <ImageBrush ImageSource="{Binding AvatarPath, TargetNullValue=/Images/default_avatar.png}"/>
+                                                    <ImageBrush ImageSource="{Binding SenderAvatar, TargetNullValue=/Images/default_avatar.png}"/>
                                                 </Ellipse.Fill>
                                             </Ellipse>
 

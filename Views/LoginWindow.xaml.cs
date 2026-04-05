@@ -22,18 +22,23 @@ namespace DonutMessager.Views
         public LoginWindow()
         {
             InitializeComponent();
-
             var vm = new LoginViewModel();
-            vm.LoginSucceeded += OnLoginSucceeded;
-
             DataContext = vm;
+
+            vm.LoginSucceeded += user =>
+            {
+                var main = new MainWindow(user);
+                main.Show();
+                this.Close();
+            };
         }
+
 
         private void OnLoginSucceeded(User user)
         {
             var main = new MainWindow(user);
             main.Show();
-            Close();
+            this.Close();
         }
 
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

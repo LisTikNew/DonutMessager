@@ -12,35 +12,20 @@ using System.Windows.Shapes;
 
 namespace DonutMessager
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(User user)
+        private MainViewModel _vm;
+
+        public MainWindow(User currentUser)
         {
             InitializeComponent();
-            DataContext = new MainViewModel(user);
+
+            _vm = new MainViewModel(currentUser);
+            DataContext = _vm;
         }
 
-
-
-
-
-        public void AddContact(string name)
+        public MainWindow() : this(new User { Username = "Designer", AvatarUrl = "/Images/default_avatar.png" })
         {
-            using (var db = new AppDbContext())
-            {
-                var contact = new Contact { Name = name };
-                db.Contacts.Add(contact);
-                db.SaveChanges();
-
-                var vm = DataContext as MainViewModel;
-                if (vm != null)
-                { 
-                    vm.Contacts.Add(contact);
-                }
-            }
         }
     }
 }

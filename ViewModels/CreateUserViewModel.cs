@@ -46,7 +46,7 @@ namespace DonutMessager.ViewModels
             var user = new User
             {
                 Username = Username,
-                AvatarPath = AvatarPath
+                AvatarPath = AvatarPath,
             };
 
             db.Users.Add(user);
