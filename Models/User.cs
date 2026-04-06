@@ -9,8 +9,7 @@ namespace DonutMessager.Models
         public int Id { get; set; }
         public string Username { get; set; }
         public string? AvatarPath { get; set; }
-        public string AvatarUrl { get; internal set; }
-
+        public string? AvatarUrl { get; set; }
         public string? PasswordHash { get; set; }
     }
 }

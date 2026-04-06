@@ -1,62 +1,73 @@
-﻿using DonutMessager.Helpers;
+﻿using DonutMessager;
+using DonutMessager.Helpers;
 using DonutMessager.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+using Microsoft.Win32;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
+using DonutMessager.ViewModels;
 
-namespace DonutMessager.ViewModels
+public class CreateUserViewModel : BaseViewModel
 {
-    public class CreateUserViewModel : INotifyPropertyChanged
+    private string _username;
+    public string Username
     {
-        public string Username { get; set; }
-        public string AvatarPath { get; set; }
+        get => _username;
+        set { _username = value; OnPropertyChanged(); }
+    }
 
-        public ICommand SelectAvatarCommand { get; }
-        public ICommand CreateCommand { get; }
+    private string _avatarPath;
+    public string AvatarPath
+    {
+        get => _avatarPath;
+        set { _avatarPath = value; OnPropertyChanged(); }
+    }
 
-        public event Action<User> UserCreated;
+    public ICommand SelectAvatarCommand { get; }
+    public ICommand CreateUserCommand { get; }
 
-        public CreateUserViewModel()
+    public event Action<User> UserCreated;
+
+    public CreateUserViewModel()
+    {
+        SelectAvatarCommand = new RelayCommand(_ => SelectAvatar());
+        CreateUserCommand = new RelayCommand(_ => CreateUser());
+
+    }
+
+    private void SelectAvatar()
+    {
+        var dialog = new OpenFileDialog
         {
-            SelectAvatarCommand = new RelayCommand(SelectAvatar);
-            CreateCommand = new RelayCommand(CreateUser);
+            Filter = "Images|*.png;*.jpg;*.jpeg"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            AvatarPath = dialog.FileName;
+        }
+    }
+
+    private void CreateUser()
+    {
+        if (string.IsNullOrWhiteSpace(Username))
+        {
+            MessageBox.Show("Введите имя пользователя");
+            return;
         }
 
-        private void SelectAvatar()
+        using var db = new AppDbContext();
+
+        var user = new User
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.Filter = "Images|*.png;*.jpg;*.jpeg";
+            Username = Username,
+            AvatarPath = AvatarPath,   // может быть null — это нормально
+            PasswordHash = null        // пока не используем
+        };
 
-            if (dialog.ShowDialog() == true)
-            {
-                AvatarPath = dialog.FileName;
-                OnPropertyChanged(nameof(AvatarPath));
-            }
-        }
+        db.Users.Add(user);
+        db.SaveChanges();
 
-        private void CreateUser()
-        {
-            if (string.IsNullOrWhiteSpace(Username))
-                return;
-
-            using var db = new AppDbContext();
-
-            var user = new User
-            {
-                Username = Username,
-                AvatarPath = AvatarPath,
-            };
-
-            db.Users.Add(user);
-            db.SaveChanges();
-
-            UserCreated?.Invoke(user);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string name)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        UserCreated?.Invoke(user);
     }
 }

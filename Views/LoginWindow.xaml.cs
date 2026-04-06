@@ -22,6 +22,7 @@ namespace DonutMessager.Views
         public LoginWindow()
         {
             InitializeComponent();
+
             var vm = new LoginViewModel();
             DataContext = vm;
 
@@ -33,6 +34,15 @@ namespace DonutMessager.Views
             };
         }
 
+        private void Login(User user)
+        {
+            Properties.Settings.Default.LastUserId = user.Id;
+            Properties.Settings.Default.Save();
+
+            var main = new MainWindow(user);
+            main.Show();
+            this.Close();
+        }
 
         private void OnLoginSucceeded(User user)
         {

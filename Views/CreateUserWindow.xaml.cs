@@ -14,8 +14,8 @@ using System.Windows.Shapes;
 
 namespace DonutMessager.Views
 {
-    public partial class CreateUserWindow : Window
-    {
+        public partial class CreateUserWindow : Window
+        {
         public User CreatedUser { get; private set; }
 
         public CreateUserWindow()
@@ -23,16 +23,14 @@ namespace DonutMessager.Views
             InitializeComponent();
 
             var vm = new CreateUserViewModel();
-            vm.UserCreated += OnUserCreated;
-
             DataContext = vm;
-        }
 
-        private void OnUserCreated(User user)
-        {
-            CreatedUser = user;
-            DialogResult = true;
-            Close();
+            vm.UserCreated += user =>
+            {
+                CreatedUser = user;
+                DialogResult = true;
+                Close();
+            };
         }
     }
 }

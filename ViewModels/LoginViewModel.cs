@@ -2,11 +2,10 @@
 using DonutMessager.Models;
 using DonutMessager.Views;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -30,8 +29,8 @@ namespace DonutMessager.ViewModels
 
         public LoginViewModel()
         {
-            LoginCommand = new RelayCommand(Login);
-            CreateUserCommand = new RelayCommand(CreateUser);
+            LoginCommand = new RelayCommand(_ => Login(SelectedUser));
+            CreateUserCommand = new RelayCommand(_ => CreateUser());
 
             LoadUsers();
         }
@@ -46,20 +45,24 @@ namespace DonutMessager.ViewModels
                 Users.Add(u);
         }
 
-        private void Login()
+        private void Login(User selectedUser)
         {
-            if (SelectedUser == null)
+            if (selectedUser == null)
             {
-                MessageBox.Show("Выберите аккаунт!");
+                MessageBox.Show("Выберите пользователя");
                 return;
             }
 
-            LoginSucceeded?.Invoke(SelectedUser);
+            Properties.Settings.Default.LastUserId = selectedUser.Id;
+            Properties.Settings.Default.Save();
+
+            LoginSucceeded?.Invoke(selectedUser);
         }
 
         private void CreateUser()
         {
             var win = new CreateUserWindow();
+
             if (win.ShowDialog() == true)
             {
                 var newUser = win.CreatedUser;
@@ -68,6 +71,10 @@ namespace DonutMessager.ViewModels
                 {
                     Users.Add(newUser);
                     SelectedUser = newUser;
+
+                    Properties.Settings.Default.LastUserId = newUser.Id;
+                    Properties.Settings.Default.Save();
+
                     LoginSucceeded?.Invoke(newUser);
                 }
             }
@@ -78,4 +85,3 @@ namespace DonutMessager.ViewModels
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
-
