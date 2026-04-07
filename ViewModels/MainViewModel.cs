@@ -65,8 +65,10 @@ namespace DonutMessager.ViewModels
         public MainViewModel(User user)
         {
             CurrentUser = user;
-            ShowChangeHint = false;
+            ShowChangeHint = Properties.Settings.Default.ShowChangeHint;
             MessageModel.CurrentUserId = CurrentUser.Id;
+            Properties.Settings.Default.ShowChangeHint = false;
+            Properties.Settings.Default.Save();
 
             SendMessageCommand = new RelayCommand(async _ => await SendMessage());
 

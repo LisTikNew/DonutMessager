@@ -28,6 +28,8 @@ namespace DonutMessager.Views
 
             vm.LoginSucceeded += user =>
             {
+                Properties.Settings.Default.LastUserId = user.Id;
+                Properties.Settings.Default.Save();
                 var main = new MainWindow(user);
                 main.Show();
                 this.Close();
@@ -46,6 +48,8 @@ namespace DonutMessager.Views
 
         private void OnLoginSucceeded(User user)
         {
+            Properties.Settings.Default.LastUserId = user.Id;
+            Properties.Settings.Default.Save();
             var main = new MainWindow(user);
             main.Show();
             this.Close();

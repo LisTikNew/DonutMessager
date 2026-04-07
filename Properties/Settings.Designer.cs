@@ -34,5 +34,17 @@ namespace DonutMessager.Properties {
                 this["LastUserId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowChangeHint {
+            get {
+                return ((bool)(this["ShowChangeHint"]));
+            }
+            set {
+                this["ShowChangeHint"] = value;
+            }
+        }
     }
 }
