@@ -16,7 +16,12 @@ namespace DonutMessager.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
 
-        public User CurrentUser { get; }
+        private User _currentUser;
+        public User CurrentUser
+        {
+            get => _currentUser;
+            set { _currentUser = value; OnPropertyChanged(); }
+        }
 
         public ObservableCollection<ChatModel> Chats { get; set; } = new();
         public ObservableCollection<MessageModel> Messages { get; set; } = new();
@@ -60,7 +65,7 @@ namespace DonutMessager.ViewModels
         public MainViewModel(User user)
         {
             CurrentUser = user;
-
+            ShowChangeHint = false;
             MessageModel.CurrentUserId = CurrentUser.Id;
 
             SendMessageCommand = new RelayCommand(async _ => await SendMessage());
