@@ -45,138 +45,76 @@
 
         <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
         <Border Background="#FF100F0F" Opacity="0.85" BorderBrush="#333" BorderThickness="0,0,1,0">
-            <Grid>
+            <Grid Background="#1E1E1E">
+
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <!-- Заголовок -->
-                    <RowDefinition Height="*"/>
-                    <!-- Контакты -->
-                    <RowDefinition Height="70"/>
-                    <!-- Текущий пользователь -->
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Заголовок -->
-                <TextBlock Text="Contacts"
-                   FontSize="20"
-                   Foreground="White"
-                   Margin="15,10"/>
+                <!-- Список чатов -->
+                <ListBox Grid.Row="0"
+             ItemsSource="{Binding Chats}"
+             SelectedItem="{Binding SelectedChat}"
+             Background="Transparent"
+             BorderThickness="0"
+             Foreground="White"
+             Margin="5">
 
-                <!-- Контакты -->
-                <Grid Grid.Row="1">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <Border Width="40" Height="40"
+                            CornerRadius="20"
+                            ClipToBounds="True"
+                            Margin="0,0,10,0">
+                                    <Image Source="{Binding AvatarUrl}"
+                               Stretch="UniformToFill"/>
+                                </Border>
 
-                    <!-- Список контактов -->
-                    <ListBox ItemsSource="{Binding Chats}"
-         SelectedItem="{Binding SelectedChat}"
-         Background="Transparent"   
-         BorderThickness="0"
-         Foreground="White"
-         Padding="10"
-         Visibility="{Binding Chats.Count, Converter={StaticResource CountToVisibilityConverter}}">
+                                <TextBlock Text="{Binding Title}"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               Foreground="White"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
 
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,8">
-                                    <Ellipse Width="40" Height="40" Margin="0,0,10,0">
-                                        <Ellipse.Fill>
-                                            <ImageBrush ImageSource="{Binding AvatarUrl, TargetNullValue=/Images/default_avatar.png}"/>
-                                        </Ellipse.Fill>
-                                    </Ellipse>
-                                    <TextBlock Text="{Binding Title}"
-                                       VerticalAlignment="Center"
-                                       FontSize="16"
-                                       Foreground="White"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                </ListBox>
 
-                    <!-- Если контактов нет -->
-                    <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Visibility="{Binding Chats.Count, Converter={StaticResource ZeroToVisibilityConverter}}">
-                        <TextBlock Text="nobody but us!"
-                           FontFamily="Arial Black"
-                           FontSize="24"
-                           Foreground="White"
-                           HorizontalAlignment="Center"/>
+                <!-- Профиль текущего пользователя -->
+                <Border Grid.Row="1"
+            Background="#262626"
+            Padding="10"
+            BorderThickness="0,1,0,0"
+            BorderBrush="#333">
 
-                        <!--
-                        <Button Content="begin a discussion"
-                        Margin="0,20,0,0"
-                        Padding="20,10"
-                        Command="{Binding CreateContactCommand}" Background="Black" Foreground="White" BorderBrush="{x:Null}"/>
-                        -->
+                    <StackPanel Orientation="Horizontal">
+
+                        <!-- Аватарка -->
+                        <Border Width="48" Height="48"
+                    CornerRadius="24"
+                    ClipToBounds="True"
+                    Margin="0,0,10,0">
+                            <Image Source="{Binding CurrentUser.AvatarPath}"
+                       Stretch="UniformToFill"/>
+                        </Border>
+
+                        <!-- Имя -->
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding CurrentUser.Name}"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="White"/>
+
+                            <TextBlock Text="Online"
+                           FontSize="12"
+                           Foreground="#88FFFFFF"/>
+                        </StackPanel>
 
                     </StackPanel>
 
-                </Grid>
-                <Border Grid.Row="1"
-        Height="1"
-        Background="#FFBFBFBF"
-        VerticalAlignment="Bottom"
-        Margin="5,0,10,0"/>
-                <!-- Текущий пользователь -->
-                <StackPanel Grid.Row="2"
-            Orientation="Horizontal"
-            Margin="10"
-            VerticalAlignment="Center">
-
-                    <Border Width="40" Height="40"
-            CornerRadius="20"
-            BorderThickness="2"
-            SnapsToDevicePixels="True">
-
-                        <Border.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="change account"
-                          Click="ChangeAccount_Click"/>
-                            </ContextMenu>
-                        </Border.ContextMenu>
-
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="6" ShadowDepth="0" Opacity="0.4"/>
-                        </Border.Effect>
-
-                        <Ellipse Width="40" Height="40" Stroke="White" StrokeThickness="2" Margin="-2,-2,-2,-2">
-                            <Ellipse.Fill>
-                                <ImageBrush ImageSource="{Binding CurrentUser.AvatarPath}"
-                            Stretch="UniformToFill"/>
-                            </Ellipse.Fill>
-                        </Ellipse>
-                    </Border>
-
-                    <!-- ВОТ СЮДА ВСТАВЛЯЕМ СТИЛЬ -->
-                    <TextBlock Text="right click here to change account!"
-               Foreground="#AAAAAA"
-               FontSize="10"
-               Margin="10,2,0,0"
-               x:Name="HintText"
-               Visibility="{Binding ShowChangeHint, Converter={StaticResource BoolToVisibility}}">
-
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Opacity" Value="1"/>
-
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ShowChangeHint}" Value="True">
-                                        <DataTrigger.EnterActions>
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                             From="1" To="0"
-                                             Duration="0:0:1.5"
-                                             BeginTime="0:0:3"/>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </DataTrigger.EnterActions>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-
-                    </TextBlock>
-
-                </StackPanel>
+                </Border>
 
             </Grid>
         </Border>
@@ -346,7 +284,7 @@
                  Padding="10"
                  Height="42"
                  Background="Transparent"
-                 SelectionBrush="{x:Null}"
+                 SelectionBrush="#00000000"
                  SelectionTextBrush="#FFFFCAFB" Grid.ColumnSpan="2" Margin="-5,4,39,4"/>
 
                         <Button Grid.Column="1"
