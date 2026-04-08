@@ -8,7 +8,7 @@ namespace DonutMessager.ViewModels
 {
     class SettingsViewModel
     {
-        public ICommand LogoutCommand => new RelayCommand(() =>
+        public ICommand LogoutCommand => new RelayCommand(_ =>
         {
             Properties.Settings.Default.LastUserId = 0;
             Properties.Settings.Default.Save();

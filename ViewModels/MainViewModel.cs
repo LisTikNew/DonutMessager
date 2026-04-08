@@ -139,5 +139,13 @@ namespace DonutMessager.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public ICommand OpenSettingsCommand => new RelayCommand(_ =>
+        {
+            var settings = new SettingsWindow(CurrentUser);
+            settings.ShowDialog();
+        });
+
+
     }
 }

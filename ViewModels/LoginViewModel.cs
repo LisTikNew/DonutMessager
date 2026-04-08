@@ -85,11 +85,11 @@ namespace DonutMessager.ViewModels
         private void OnPropertyChanged([CallerMemberName] string name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        public ICommand LoginNewAccountCommand => new RelayCommand(() =>
+        public ICommand LoginNewAccountCommand => new RelayCommand((_ =>
         {
             var reg = new CreateUserWindow();
             reg.Show();
             CloseAction?.Invoke();
-        });
+        }));
     }
 }

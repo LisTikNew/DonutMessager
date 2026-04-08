@@ -88,7 +88,6 @@
             Padding="10"
             BorderThickness="0,1,0,0"
             BorderBrush="#333">
-
                     <StackPanel Orientation="Horizontal">
 
                         <!-- Аватарка -->
@@ -110,15 +109,15 @@
                             <TextBlock Text="Online"
                            FontSize="12"
                            Foreground="#88FFFFFF"/>
-                        </StackPanel
-                                    <Button Content="Settings"
-        Command="{Binding OpenSettingsCommand}"
-        Style="{StaticResource SidebarButtonStyle}" />
+                        </StackPanel>
                     </StackPanel>
+                    
 
                 </Border>
 
             </Grid>
+            
+            
         </Border>
 
 
