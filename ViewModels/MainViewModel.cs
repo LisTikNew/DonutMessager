@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 
@@ -20,11 +21,7 @@ namespace DonutMessager.ViewModels
         public User CurrentUser
         {
             get => _currentUser;
-            set
-            {
-                _currentUser = value;
-                OnPropertyChanged();
-            }
+            set { _currentUser = value; OnPropertyChanged(); }
         }
 
         public ObservableCollection<ChatModel> Chats { get; set; } = new();
@@ -69,6 +66,9 @@ namespace DonutMessager.ViewModels
         public MainViewModel(User user)
         {
             CurrentUser = user;
+            if (CurrentUser == null)
+                MessageBox.Show("CurrentUser == null");
+
             ShowChangeHint = Properties.Settings.Default.ShowChangeHint;
             MessageModel.CurrentUserId = CurrentUser.Id;
             Properties.Settings.Default.ShowChangeHint = false;

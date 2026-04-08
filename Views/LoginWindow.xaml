@@ -9,8 +9,8 @@
     <Grid Width="800" Height="500" MinWidth="800" MinHeight="500" MaxWidth="800" MaxHeight="500">
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FFF86CFF"/>
-                <GradientStop Color="#FF5D395F" Offset="1"/>
+                <GradientStop Color="#FF262626"/>
+                <GradientStop Color="Black" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
 
@@ -20,9 +20,9 @@
 
         <Rectangle HorizontalAlignment="Left" Height="48" Margin="200,356,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="13" RadiusY="13"/>
 
-        <Label x:Name="Label" Content="Let's beginn!" HorizontalAlignment="Left" Height="97" Margin="168,10,0,0" VerticalAlignment="Top" Width="484" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60"/>
-        <Label x:Name="Label_Copy" Content="Pick one of your accounts" HorizontalAlignment="Left" Height="28" Margin="201,95,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18"/>
-        <Label x:Name="Label_Copy1" Content="or" HorizontalAlignment="Left" Height="28" Margin="201,307,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18"/>
+        <Label x:Name="Label" Content="Let's beginn!" HorizontalAlignment="Left" Height="97" Margin="168,10,0,0" VerticalAlignment="Top" Width="484" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" Foreground="White"/>
+        <Label x:Name="Label_Copy" Content="Pick one of your accounts" HorizontalAlignment="Left" Height="28" Margin="201,95,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
+        <Label x:Name="Label_Copy1" Content="or" HorizontalAlignment="Left" Height="28" Margin="201,307,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
         <Button x:Name="RegButton" Content="REGISTER A NEW ACCOUNT" HorizontalAlignment="Left" Height="48" Margin="201,356,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" FontSize="22" Background="{x:Null}" BorderBrush="{x:Null}" Command="{Binding CreateUserCommand}"/>
         <Button Content="LOGIN"
         Command="{Binding LoginCommand}"
@@ -31,7 +31,7 @@
         Width="418"
         FontFamily="Arial Black"
         FontSize="22"
-        BorderBrush="{x:Null}" Background="#00DDDDDD"/>
+        BorderBrush="{x:Null}" Background="#00DDDDDD" Foreground="Black"/>
         <ListBox HorizontalAlignment="Left"
          Height="113"
          Margin="214,137,0,0"
