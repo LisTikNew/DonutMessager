@@ -110,8 +110,10 @@
                             <TextBlock Text="Online"
                            FontSize="12"
                            Foreground="#88FFFFFF"/>
-                        </StackPanel>
-
+                        </StackPanel
+                                    <Button Content="Settings"
+        Command="{Binding OpenSettingsCommand}"
+        Style="{StaticResource SidebarButtonStyle}" />
                     </StackPanel>
 
                 </Border>

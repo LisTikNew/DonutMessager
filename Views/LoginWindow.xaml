@@ -14,20 +14,23 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <Rectangle HorizontalAlignment="Left" Height="73" Margin="201,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="10" RadiusY="10"/>
+        <Rectangle HorizontalAlignment="Left" Height="48" Margin="201,342,0,0" Stroke="Black" VerticalAlignment="Top" Width="419" Fill="#FFFF95FB" RadiusX="10" RadiusY="10"/>
 
-        <Rectangle HorizontalAlignment="Left" Height="135" Margin="201,126,0,0" Stroke="White" VerticalAlignment="Top" Width="418" Fill="White" RadiusX="10" RadiusY="10"/>
+        <Rectangle HorizontalAlignment="Left" Height="93" Margin="200,229,0,0" Stroke="Black" VerticalAlignment="Top" Width="419" Fill="#FFFF95FB" RadiusX="10" RadiusY="10"/>
 
-        <Rectangle HorizontalAlignment="Left" Height="48" Margin="200,356,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="13" RadiusY="13"/>
+        <Rectangle HorizontalAlignment="Left" Height="135" Margin="201,126,0,0" Stroke="White" VerticalAlignment="Top" Width="417" Fill="White" RadiusX="10" RadiusY="10"/>
+
+        <Rectangle HorizontalAlignment="Left" Height="48" Margin="200,409,0,0" Stroke="Black" VerticalAlignment="Top" Width="418" Fill="#FFFF95FB" RadiusX="13" RadiusY="13"/>
 
         <Label x:Name="Label" Content="Let's beginn!" HorizontalAlignment="Left" Height="97" Margin="168,10,0,0" VerticalAlignment="Top" Width="484" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" Foreground="White"/>
         <Label x:Name="Label_Copy" Content="Pick one of your accounts" HorizontalAlignment="Left" Height="28" Margin="201,95,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
-        <Label x:Name="Label_Copy1" Content="or" HorizontalAlignment="Left" Height="28" Margin="201,307,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
-        <Button x:Name="RegButton" Content="REGISTER A NEW ACCOUNT" HorizontalAlignment="Left" Height="48" Margin="201,356,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" FontSize="22" Background="{x:Null}" BorderBrush="{x:Null}" Command="{Binding CreateUserCommand}"/>
+
+        <Label x:Name="Label_Copy1" Content="or" HorizontalAlignment="Left" Height="28" Margin="202,381,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
+        <Button x:Name="RegButton" Content="REGISTER A NEW ACCOUNT" HorizontalAlignment="Left" Height="48" Margin="200,409,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" FontSize="22" Background="{x:Null}" BorderBrush="{x:Null}" Command="{Binding CreateUserCommand}"/>
         <Button Content="LOGIN"
         Command="{Binding LoginCommand}"
         HorizontalAlignment="Left"
-        Margin="201,261,0,198"
+        Margin="201,286,0,178"
         Width="418"
         FontFamily="Arial Black"
         FontSize="22"
@@ -61,5 +64,16 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <PasswordBox x:Name="PasswordBox"
+             HorizontalAlignment="Left"
+             Height="31"
+             Margin="201,255,0,0"
+             VerticalAlignment="Top"
+             Width="417"
+             FontWeight="Bold"
+             FontSize="20"
+             VerticalContentAlignment="Center"/>
+        <Label x:Name="Label_Copy2" Content="or" HorizontalAlignment="Left" Height="28" Margin="202,314,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="18" Foreground="White"/>
+        <Button x:Name="NewLoginButton" Content="REGISTER A NEW ACCOUNT" HorizontalAlignment="Left" Height="48" Margin="200,342,0,0" VerticalAlignment="Top" Width="418" FontFamily="Arial Black" FontSize="22" Background="{x:Null}" BorderBrush="{x:Null}" Command="{Binding LoginNewAccountCommand}"/>
     </Grid>
 </Window>

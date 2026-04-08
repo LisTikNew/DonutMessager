@@ -36,6 +36,12 @@ namespace DonutMessager.Views
             };
         }
 
+        private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is LoginViewModel vm)
+                vm.Password = PasswordBox.Password;
+        }
+
         private void Login(User user)
         {
             Properties.Settings.Default.LastUserId = user.Id;

@@ -13,6 +13,7 @@ namespace DonutMessager.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
+        public string Password { get; set; }
         public ObservableCollection<User> Users { get; set; } = new();
 
         private User _selectedUser;
@@ -83,5 +84,12 @@ namespace DonutMessager.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public ICommand LoginNewAccountCommand => new RelayCommand(() =>
+        {
+            var reg = new CreateUserWindow();
+            reg.Show();
+            CloseAction?.Invoke();
+        });
     }
 }

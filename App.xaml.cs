@@ -29,8 +29,29 @@ namespace DonutMessager
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var login = new LoginWindow();
-            login.Show();
+            using var db = new AppDbContext();
+
+            // Если нет ни одного аккаунта → сразу регистрация
+            if (!db.Users.Any())
+            {
+                new CreateUserWindow().Show();
+                return;
+            }
+
+            // Если есть сохранённый пользователь → автологин
+            var lastId = Properties.Settings.Default.LastUserId;
+            if (lastId > 0)
+            {
+                var user = db.Users.FirstOrDefault(u => u.Id == lastId);
+                if (user != null)
+                {
+                    new MainWindow(user).Show();
+                    return;
+                }
+            }
+
+            // Иначе → LoginWindow
+            new LoginWindow().Show();
         }
     }
 }
