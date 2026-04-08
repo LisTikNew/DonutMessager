@@ -20,7 +20,11 @@ namespace DonutMessager.ViewModels
         public User CurrentUser
         {
             get => _currentUser;
-            set { _currentUser = value; OnPropertyChanged(); }
+            set
+            {
+                _currentUser = value;
+                OnPropertyChanged();
+            }
         }
 
         public ObservableCollection<ChatModel> Chats { get; set; } = new();

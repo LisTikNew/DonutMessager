@@ -13,9 +13,7 @@ namespace DonutMessager
         public MainWindow(User user)
         {
             InitializeComponent();
-
-            _vm = new MainViewModel(user);
-            DataContext = _vm;
+            DataContext = new MainViewModel(user);
         }
 
         private void ChangeAccount_Click(object sender, RoutedEventArgs e)
