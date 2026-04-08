@@ -1,4 +1,5 @@
 ﻿using DonutMessager.Helpers;
+using DonutMessager.Views;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,24 +7,32 @@ using System.Windows.Input;
 
 namespace DonutMessager.ViewModels
 {
-    class SettingsViewModel
+    public class SettingsViewModel : BaseViewModel
     {
-        public ICommand LogoutCommand => new RelayCommand(_ =>
+        public Action CloseAction { get; set; }
+
+        public ICommand LogoutCommand { get; }
+        public ICommand ChangeAccountCommand { get; }
+
+        public SettingsViewModel()
         {
-            Properties.Settings.Default.LastUserId = 0;
-            Properties.Settings.Default.Save();
+            LogoutCommand = new RelayCommand(_ =>
+            {
+                Properties.Settings.Default.LastUserId = 0;
+                Properties.Settings.Default.Save();
 
-            new LoginWindow().Show();
-            CloseAction?.Invoke();
-        });
+                new LoginWindow().Show();
+                CloseAction?.Invoke();
+            });
 
-        public ICommand ChangeAccountCommand => new RelayCommand(() =>
-        {
-            Properties.Settings.Default.LastUserId = 0;
-            Properties.Settings.Default.Save();
+            ChangeAccountCommand = new RelayCommand(_ =>
+            {
+                Properties.Settings.Default.LastUserId = 0;
+                Properties.Settings.Default.Save();
 
-            new LoginWindow().Show();
-            CloseAction?.Invoke();
-        });
+                new LoginWindow().Show();
+                CloseAction?.Invoke();
+            });
+        }
     }
 }

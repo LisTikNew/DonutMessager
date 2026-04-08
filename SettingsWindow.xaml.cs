@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DonutMessager.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -20,6 +21,11 @@ namespace DonutMessager
         public SettingsWindow()
         {
             InitializeComponent();
+
+            var vm = new SettingsViewModel();
+            DataContext = vm;
+
+            vm.CloseAction = Close;
         }
     }
 }
