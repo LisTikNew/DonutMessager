@@ -13,26 +13,21 @@ using System.Windows.Shapes;
 
 namespace DonutMessager.Views
 {
-    /// <summary>
-    /// Interaction logic for NewLoginWindow.xaml
-    /// </summary>
     public partial class NewLoginWindow : Window
     {
         public NewLoginWindow()
         {
             InitializeComponent();
 
-            Loaded += (_, __) =>
-            {
-                if (DataContext is NewLoginViewModel vm)
-                    vm.CloseAction = Close;
-            };
+            var vm = new NewLoginViewModel();
+            vm.CloseAction = Close;
+            DataContext = vm;
         }
 
-        private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (DataContext is NewLoginViewModel vm)
-                vm.Password = ((PasswordBox)sender).Password;
+                vm.Password = PasswordBox.Password;
         }
     }
 }

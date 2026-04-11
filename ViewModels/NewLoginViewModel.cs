@@ -1,7 +1,9 @@
 ﻿using DonutMessager.Helpers;
+using DonutMessager.Views;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DonutMessager.ViewModels
@@ -70,6 +72,7 @@ namespace DonutMessager.ViewModels
 
             if (user != null && user.Password == Password)
             {
+                // 4. Добавляем пользователя в локальный список
                 LocalUsers.Add(user.Id);
 
                 Properties.Settings.Default.LastUserId = user.Id;
@@ -79,8 +82,17 @@ namespace DonutMessager.ViewModels
                 Application.Current.MainWindow = main;
                 main.Show();
 
-                CloseAction?.Invoke();
+                MessageBox.Show(
+                    "New account added successfully",
+                    "Success",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
 
+                CloseAction?.Invoke();
+            }
+            else
+            {
+                ErrorMessage = "Wrong Username or Password";
             }
         }
     }

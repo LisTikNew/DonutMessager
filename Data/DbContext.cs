@@ -11,7 +11,7 @@ namespace DonutMessager
     {
         internal DbSet<User> Users { get; set; }
         internal DbSet<Contact> Contacts { get; set; }
-        internal DbSet<Message> Messages { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {

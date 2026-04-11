@@ -13,5 +13,7 @@ namespace DonutMessager.Models
         public string? AvatarUrl { get; set; }
         public string? PasswordHash { get; set; }
         public string Password {  get; set; }
+        public bool IsOnline { get; set; }
+        public DateTime LastSeen { get; set; }
     }
 }

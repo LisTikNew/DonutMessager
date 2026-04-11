@@ -30,17 +30,13 @@ namespace DonutMessager.ViewModels
                 if (!confirm.Confirmed)
                     return;
 
-                // ❗ Удаляем только локально
                 LocalUsers.Remove(CurrentUser.Id);
 
-                // ❗ Сбрасываем автологин
                 Properties.Settings.Default.LastUserId = 0;
                 Properties.Settings.Default.Save();
 
-                // Закрываем SettingsWindow
                 CloseAction?.Invoke();
 
-                // Перезапуск приложения
                 Application.Current.Shutdown();
                 System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
             });

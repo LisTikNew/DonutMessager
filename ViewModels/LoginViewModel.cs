@@ -40,11 +40,16 @@ namespace DonutMessager.ViewModels
         private void LoadUsers()
         {
             using var db = new AppDbContext();
-            var localIds = LocalAccounts.GetLoggedUsers();
 
-            Users = db.Users
-                      .Where(u => localIds.Contains(u.Id))
-                      .ToList();
+            var localIds = LocalUsers.Get();
+
+            var users = db.Users
+                          .Where(u => localIds.Contains(u.Id))
+                          .ToList();
+
+            Users.Clear();
+            foreach (var u in users)
+                Users.Add(u);
         }
 
         private void Login(User selectedUser)

@@ -1,154 +1,122 @@
-﻿using DonutMessager;
-using DonutMessager.Helpers;
+﻿using DonutMessager.Helpers;
 using DonutMessager.Models;
-using DonutMessenger.Client.Services;
-using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Linq;
 using System.Windows.Input;
-using DonutMessager.Views;
-
+using System.Windows.Threading;
 
 namespace DonutMessager.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : BaseViewModel
     {
+        public User CurrentUser { get; }
 
-        private User _currentUser;
-        public User CurrentUser
+        public ObservableCollection<Message> Messages { get; set; } = new();
+
+        private User _selectedChatUser;
+        public User SelectedChatUser
         {
-            get => _currentUser;
-            set { _currentUser = value; OnPropertyChanged(); }
-        }
-
-        public ObservableCollection<ChatModel> Chats { get; set; } = new();
-        public ObservableCollection<MessageModel> Messages { get; set; } = new();
-
-        private bool _showChangeHint = true;
-        public bool ShowChangeHint
-        {
-            get => _showChangeHint;
-            set { _showChangeHint = value; OnPropertyChanged(); }
-        }
-
-
-
-
-        private ChatModel _selectedChat;
-        public ChatModel SelectedChat
-        {
-            get => _selectedChat;
+            get => _selectedChatUser;
             set
             {
-                if (_selectedChat != value)
-                {
-                    _selectedChat = value;
-                    OnPropertyChanged();
-
-                    LoadChatMessages();
-                    JoinChatRoom();
-                }
+                _selectedChatUser = value;
+                OnPropertyChanged();
+                LoadChatMessages();
             }
         }
 
-        private string _messageText;
-        public string MessageText
+        private string _currentMessageText;
+        public string CurrentMessageText
         {
-            get => _messageText;
-            set { _messageText = value; OnPropertyChanged(); }
+            get => _currentMessageText;
+            set
+            {
+                _currentMessageText = value;
+                OnPropertyChanged();
+
+                IsTyping = true;
+                ResetTypingTimer();
+            }
+        }
+
+        private bool _isTyping;
+        public bool IsTyping
+        {
+            get => _isTyping;
+            set { _isTyping = value; OnPropertyChanged(); }
         }
 
         public ICommand SendMessageCommand { get; }
 
-        private readonly SignalRService _signalR;
+        private readonly DispatcherTimer typingTimer;
 
         public MainViewModel(User user)
         {
             CurrentUser = user;
-            if (CurrentUser == null)
-                MessageBox.Show("CurrentUser == null");
 
-            ShowChangeHint = Properties.Settings.Default.ShowChangeHint;
-            MessageModel.CurrentUserId = CurrentUser.Id;
-            Properties.Settings.Default.ShowChangeHint = false;
-            Properties.Settings.Default.Save();
+            SendMessageCommand = new RelayCommand(_ => SendMessage());
 
-            SendMessageCommand = new RelayCommand(async _ => await SendMessage());
+            typingTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
 
-            _signalR = new SignalRService("http://localhost:5227");
-            InitializeSignalR();
-
-            LoadChats();
+            typingTimer.Tick += (_, __) =>
+            {
+                IsTyping = false;
+                typingTimer.Stop();
+            };
         }
 
-        private async void InitializeSignalR()
+        private void ResetTypingTimer()
         {
-            await _signalR.StartAsync();
-
-            _signalR.Connection.On("ReceiveMessage",
-                (int chatId, int senderId, string text, DateTime timestamp) =>
-                {
-                    if (SelectedChat != null && SelectedChat.Id == chatId)
-                    {
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            Messages.Add(new MessageModel
-                            {
-                                ChatId = chatId,
-                                SenderId = senderId,
-                                Text = text,
-                                Timestamp = timestamp
-                            });
-                        });
-                    }
-                });
+            typingTimer.Stop();
+            typingTimer.Start();
         }
 
-        private async void LoadChats()
+        private void LoadChatMessages()
         {
-            Chats.Clear();
-            Chats.Add(new ChatModel { Id = 1, Title = "Test chat", AvatarUrl = "/Images/default_avatar.png" });
-            Chats.Add(new ChatModel { Id = 2, Title = "Another chat", AvatarUrl = "/Images/default_avatar.png" });
-        }
-
-        private async void LoadChatMessages()
-        {
-            if (SelectedChat == null) return;
-
-            // TODO: запрос на сервер /api/message/{chatId}/history
-        }
-
-        private async void JoinChatRoom()
-        {
-            if (SelectedChat != null)
-                await _signalR.JoinChat(SelectedChat.Id);
-        }
-
-        private async Task SendMessage()
-        {
-            if (string.IsNullOrWhiteSpace(MessageText) || SelectedChat == null)
+            if (SelectedChatUser == null)
                 return;
 
-            await _signalR.SendMessage(SelectedChat.Id, CurrentUser.Id, MessageText);
+            using var db = new AppDbContext();
 
-            MessageText = "";
-            OnPropertyChanged(nameof(MessageText));
+            var msgs = db.Messages
+                .Where(m =>
+                    (m.SenderId == CurrentUser.Id && m.ReceiverId == SelectedChatUser.Id) ||
+                    (m.SenderId == SelectedChatUser.Id && m.ReceiverId == CurrentUser.Id))
+                .OrderBy(m => m.Timestamp)
+                .ToList();
+
+            Messages.Clear();
+            foreach (var m in msgs)
+                Messages.Add(m);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
-        public ICommand OpenSettingsCommand => new RelayCommand(_ =>
+        private void SendMessage()
         {
-            var settings = new SettingsWindow(CurrentUser);
-            settings.ShowDialog();
-        });
+            if (string.IsNullOrWhiteSpace(CurrentMessageText))
+                return;
 
+            if (SelectedChatUser == null)
+                return;
 
+            var msg = new Message
+            {
+                SenderId = CurrentUser.Id,
+                ReceiverId = SelectedChatUser.Id,
+                Text = CurrentMessageText,
+                Timestamp = DateTime.Now
+            };
+
+            using var db = new AppDbContext();
+            db.Messages.Add(msg);
+            db.SaveChanges();
+
+            Messages.Add(msg);
+
+            CurrentMessageText = "";
+        }
     }
 }
