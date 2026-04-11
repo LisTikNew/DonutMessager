@@ -5,7 +5,8 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Media.Animation;
 
-namespace DonutMessager
+
+namespace DonutMessager.Views
 {
     public partial class MainWindow : Window
     {
