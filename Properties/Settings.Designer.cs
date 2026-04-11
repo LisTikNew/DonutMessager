@@ -46,5 +46,17 @@ namespace DonutMessager.Properties {
                 this["ShowChangeHint"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LoggedUsers {
+            get {
+                return ((string)(this["LoggedUsers"]));
+            }
+            set {
+                this["LoggedUsers"] = value;
+            }
+        }
     }
 }

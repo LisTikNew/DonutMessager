@@ -1,14 +1,17 @@
 ﻿using DonutMessager;
 using DonutMessager.Helpers;
 using DonutMessager.Models;
+using DonutMessager.ViewModels;
+using DonutMessager.Views;
 using Microsoft.Win32;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using DonutMessager.ViewModels;
 
 public class CreateUserViewModel : BaseViewModel
 {
+    public Action CloseAction { get; set; }
+
     private string _username;
     public string Username
     {
@@ -23,6 +26,13 @@ public class CreateUserViewModel : BaseViewModel
         set { _avatarPath = value; OnPropertyChanged(); }
     }
 
+    private string _password;
+    public string Password
+    {
+        get => _password;
+        set { _password = value; OnPropertyChanged(); }
+    }
+
     public ICommand SelectAvatarCommand { get; }
     public ICommand CreateUserCommand { get; }
 
@@ -31,7 +41,31 @@ public class CreateUserViewModel : BaseViewModel
     public CreateUserViewModel()
     {
         SelectAvatarCommand = new RelayCommand(_ => SelectAvatar());
-        CreateUserCommand = new RelayCommand(_ => CreateUser());
+        CreateUserCommand = new RelayCommand(_ =>
+        {
+            if (string.IsNullOrWhiteSpace(Username) ||
+                string.IsNullOrWhiteSpace(Password))
+            {
+                MessageBox.Show("Введите логин и пароль");
+                return;
+            }
+
+            using var db = new AppDbContext();
+
+            var user = new User
+            {
+                Username = Username,
+                Password = Password // позже можно хешировать
+            };
+
+            db.Users.Add(user);
+            db.SaveChanges();
+
+            MessageBox.Show("Аккаунт создан!");
+
+            new LoginWindow().Show();
+            CloseAction?.Invoke();
+        });
 
     }
 

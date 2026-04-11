@@ -1,14 +1,13 @@
 ﻿<Application x:Class="DonutMessager.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:DonutMessager.Converters"
-             Startup="Application_Startup">
+             xmlns:conv="clr-namespace:DonutMessager.Converters">
 
     <Application.Resources>
-        <local:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
-        <local:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
-        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
-        <local:NotNullToCollapsedConverter x:Key="NotNullToCollapsedConverter"/>
+        <conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <conv:NotNullToCollapsedConverter x:Key="NotNullToCollapsedConverter"/>
     </Application.Resources>
 
 </Application>

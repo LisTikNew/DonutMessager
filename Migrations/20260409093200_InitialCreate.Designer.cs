@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DonutMessager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260406150212_Initial")]
-    partial class Initial
+    [Migration("20260409093200_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

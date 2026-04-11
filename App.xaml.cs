@@ -1,5 +1,7 @@
-﻿using DonutMessager.Properties;
+﻿using DonutMessager.Models;
+using DonutMessager.Properties;
 using DonutMessager.Views;
+using System.Linq;
 using System.Windows;
 
 namespace DonutMessager
@@ -10,48 +12,39 @@ namespace DonutMessager
         {
             base.OnStartup(e);
 
+            using var db = new AppDbContext();
+
+            // 1. Автологин
             int lastId = Settings.Default.LastUserId;
 
             if (lastId > 0)
             {
-                using var db = new AppDbContext();
                 var user = db.Users.FirstOrDefault(u => u.Id == lastId);
-
                 if (user != null)
                 {
-                    new MainWindow(user).Show();
+                    // Автоматический вход
+                    var main = new MainWindow(user);
+                    MainWindow = main;
+                    main.Show();
                     return;
                 }
             }
 
-            new LoginWindow().Show();
-        }
+            // 2. Если есть аккаунты → LoginWindow
+            bool hasUsers = db.Users.Any();
 
-        private void Application_Startup(object sender, StartupEventArgs e)
-        {
-            using var db = new AppDbContext();
-
-            // Если нет ни одного аккаунта → сразу регистрация
-            if (!db.Users.Any())
+            if (hasUsers)
             {
-                new CreateUserWindow().Show();
+                var login = new LoginWindow();
+                MainWindow = login;
+                login.Show();
                 return;
             }
 
-            // Если есть сохранённый пользователь → автологин
-            var lastId = Properties.Settings.Default.LastUserId;
-            if (lastId > 0)
-            {
-                var user = db.Users.FirstOrDefault(u => u.Id == lastId);
-                if (user != null)
-                {
-                    new MainWindow(user).Show();
-                    return;
-                }
-            }
-
-            // Иначе → LoginWindow
-            new LoginWindow().Show();
+            // 3. Если нет аккаунтов → CreateUserWindow
+            var create = new CreateUserWindow();
+            MainWindow = create;
+            create.Show();
         }
     }
 }

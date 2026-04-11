@@ -12,5 +12,6 @@ namespace DonutMessager.Models
         public string? AvatarPath { get; set; }
         public string? AvatarUrl { get; set; }
         public string? PasswordHash { get; set; }
+        public string Password {  get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DonutMessager.Models;
 using DonutMessager.ViewModels;
 using DonutMessager.Views;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -26,6 +27,7 @@ namespace DonutMessager
 
         private bool _hintPlayed = false;
 
+
         public bool ShowChangeHint { get; private set; }
 
         private void Hint_Loaded(object sender, RoutedEventArgs e)
@@ -40,8 +42,19 @@ namespace DonutMessager
                 ShowChangeHint = false;
         }
 
-        public MainWindow() : this(new User { Username = "Designer", AvatarUrl = "/Images/default_avatar.png" })
+        private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
+            if (DataContext is MainViewModel vm)
+            {
+                var settings = new SettingsWindow(vm.CurrentUser);
+                settings.ShowDialog();
+            }
         }
+
+        private void Messages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            ChatScroll.ScrollToEnd();
+        }
+
     }
 }

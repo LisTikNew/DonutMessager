@@ -13,6 +13,7 @@ namespace DonutMessager.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
+        public Action CloseAction { get; set; }
         public string Password { get; set; }
         public ObservableCollection<User> Users { get; set; } = new();
 
@@ -39,11 +40,11 @@ namespace DonutMessager.ViewModels
         private void LoadUsers()
         {
             using var db = new AppDbContext();
-            var users = db.Users.ToList();
+            var localIds = LocalAccounts.GetLoggedUsers();
 
-            Users.Clear();
-            foreach (var u in users)
-                Users.Add(u);
+            Users = db.Users
+                      .Where(u => localIds.Contains(u.Id))
+                      .ToList();
         }
 
         private void Login(User selectedUser)
@@ -87,7 +88,7 @@ namespace DonutMessager.ViewModels
 
         public ICommand LoginNewAccountCommand => new RelayCommand((_ =>
         {
-            var reg = new CreateUserWindow();
+            var reg = new NewLoginWindow();
             reg.Show();
             CloseAction?.Invoke();
         }));

@@ -25,6 +25,7 @@ namespace DonutMessager.Views
 
             var vm = new LoginViewModel();
             DataContext = vm;
+            vm.CloseAction = () => this.Close();
 
             vm.LoginSucceeded += user =>
             {
@@ -66,6 +67,11 @@ namespace DonutMessager.Views
             var vm = DataContext as LoginViewModel;
             if (vm?.SelectedUser != null)
                 vm.LoginCommand.Execute(null);
+        }
+
+        private void NewLoginButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using DonutMessager.Views;
 
 
 namespace DonutMessager.ViewModels
@@ -33,6 +34,8 @@ namespace DonutMessager.ViewModels
             get => _showChangeHint;
             set { _showChangeHint = value; OnPropertyChanged(); }
         }
+
+
 
 
         private ChatModel _selectedChat;

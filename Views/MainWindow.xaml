@@ -37,11 +37,11 @@
         </Grid.ColumnDefinitions>
 
         <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
-        
+
 
         <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
-        
-        
+
+
 
         <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
         <Border Background="#FF100F0F" Opacity="0.85" BorderBrush="#333" BorderThickness="0,0,1,0">
@@ -84,40 +84,57 @@
 
                 <!-- Профиль текущего пользователя -->
                 <Border Grid.Row="1"
-            Background="#262626"
-            Padding="10"
-            BorderThickness="0,1,0,0"
-            BorderBrush="#333">
-                    <StackPanel Orientation="Horizontal">
+        Background="#262626"
+        Padding="10"
+        BorderThickness="0,1,0,0"
+        BorderBrush="#333">
 
-                        <!-- Аватарка -->
-                        <Border Width="48" Height="48"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Левая часть: аватар + имя -->
+                        <StackPanel Orientation="Horizontal"
+                    Grid.Column="0">
+                            <!-- Аватарка -->
+                            <Border Width="48" Height="48"
                     CornerRadius="24"
                     ClipToBounds="True"
                     Margin="0,0,10,0">
-                            <Image Source="{Binding CurrentUser.AvatarPath}"
+                                <Image Source="{Binding CurrentUser.AvatarPath}"
                        Stretch="UniformToFill"/>
-                        </Border>
+                            </Border>
 
-                        <!-- Имя -->
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="{Binding CurrentUser.Name}"
+                            <!-- Имя -->
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentUser.Name}"
                            FontSize="16"
                            FontWeight="Bold"
                            Foreground="White"/>
 
-                            <TextBlock Text="Online"
+                                <TextBlock Text="Online"
                            FontSize="12"
                            Foreground="#88FFFFFF"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                    
+
+                        <!-- Правая часть: кнопка Settings -->
+                        <Button Grid.Column="1"
+                Content="⚙"
+                Width="32"
+                Height="32"
+                Margin="10,0,0,0"
+                Foreground="White"
+                BorderBrush="#555"
+                BorderThickness="1"
+                Cursor="Hand"
+                Click="OpenSettings_Click" Background="#00DDDDDD"/>
+                    </Grid>
 
                 </Border>
-
             </Grid>
-            
-            
         </Border>
 
 
@@ -189,10 +206,10 @@
         Padding="10"
         Grid.Row="1"
         Margin="0,6,0,0">
-                    
-                    
+
+
                     <!-- убрали 59 -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="-10,-10,-10,-10">
+                    <ScrollViewer x:Name="ChatScroll" VerticalScrollBarVisibility="Auto" Margin="-10,-10,-10,-10">
                         <ItemsControl ItemsSource="{Binding Messages}" Width="736">
 
                             <ItemsControl.ItemTemplate>

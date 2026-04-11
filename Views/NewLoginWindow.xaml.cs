@@ -1,5 +1,4 @@
-﻿using DonutMessager.Models;
-using DonutMessager.ViewModels;
+﻿using DonutMessager.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,40 +13,26 @@ using System.Windows.Shapes;
 
 namespace DonutMessager.Views
 {
-    public partial class CreateUserWindow : Window
+    /// <summary>
+    /// Interaction logic for NewLoginWindow.xaml
+    /// </summary>
+    public partial class NewLoginWindow : Window
     {
-        public User CreatedUser { get; private set; }
-
-        public CreateUserWindow()
+        public NewLoginWindow()
         {
             InitializeComponent();
 
-            var vm = new CreateUserViewModel();
-            DataContext = vm;
-
             Loaded += (_, __) =>
             {
-                if (DataContext is CreateUserViewModel vm)
+                if (DataContext is NewLoginViewModel vm)
                     vm.CloseAction = Close;
-            };
-
-
-
-            vm.UserCreated += user =>
-            {
-                CreatedUser = user;
-                DialogResult = true;   // теперь работает
-                Close();
             };
         }
 
         private void PasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
         {
-            if (DataContext is CreateUserViewModel vm)
+            if (DataContext is NewLoginViewModel vm)
                 vm.Password = ((PasswordBox)sender).Password;
         }
-
     }
 }
-
-
