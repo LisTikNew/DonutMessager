@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DonutMessager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260409093200_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260411214958_AddUserOnlineFields")]
+    partial class AddUserOnlineFields
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,9 +50,6 @@ namespace DonutMessager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsMine")
-                        .HasColumnType("boolean");
-
                     b.Property<int>("ReceiverId")
                         .HasColumnType("integer");
 
@@ -83,6 +80,16 @@ namespace DonutMessager.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("AvatarUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LastSeen")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")

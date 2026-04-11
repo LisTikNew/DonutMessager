@@ -46,17 +46,12 @@ namespace DonutMessager.ViewModels
                 Properties.Settings.Default.LastUserId = 0;
                 Properties.Settings.Default.Save();
 
-                CloseAction?.Invoke();
-
-                Application.Current.Shutdown();
-                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-
-                // закрываем старые окна
-                CloseAction?.Invoke();
-                Application.Current.Windows
-                    .OfType<MainWindow>()
-                    .FirstOrDefault()?
-                    .Close();
+                var login = new LoginWindow();
+                Application.Current.MainWindow = login;
+                login.Show();
+                foreach (Window w in Application.Current.Windows)
+                    if (w != login)
+                        w.Close();
             });
         }
     }

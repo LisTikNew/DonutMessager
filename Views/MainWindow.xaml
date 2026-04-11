@@ -186,12 +186,26 @@
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="32" Height="32" Fill="#444"/>
                         <StackPanel Margin="0,-2,0,0">
+                            <!-- Имя собеседника -->
                             <TextBlock Text="{Binding SelectedChat.Title}"
-                       Foreground="White"
-                       FontSize="16"
-                       FontWeight="Bold"/>
-                            <TextBox Text="{Binding CurrentMessageText, UpdateSourceTrigger=PropertyChanged}"
-         TextChanged="TextBox_TextChanged" Margin="0,-2,0,0" Background="Transparent" Foreground="White" SelectionBrush="{x:Null}" SelectionTextBrush="{x:Null}" BorderBrush="{x:Null}"/>
+               Foreground="White"
+               FontSize="16"
+               FontWeight="Bold"/>
+
+                            <!-- Статус: Online / typing... -->
+                            <TextBlock FontSize="12"
+               Foreground="#88FFFFFF">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Online"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTyping}" Value="True">
+                                                <Setter Property="Text" Value="typing..."/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -211,7 +225,6 @@
                     <!-- убрали 59 -->
                     <ScrollViewer x:Name="ChatScroll" VerticalScrollBarVisibility="Auto" Margin="-10,-10,-10,-10">
                         <ItemsControl ItemsSource="{Binding Messages}" Width="736">
-
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="0,8">
@@ -262,8 +275,6 @@
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-                            <TextBlock Text="typing..."
-           Visibility="{Binding IsTyping, Converter={StaticResource BoolToVisibility}}"/>
                         </ItemsControl>
                     </ScrollViewer>
 
