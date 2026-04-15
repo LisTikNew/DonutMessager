@@ -13,6 +13,7 @@
     <None Remove="Gemini_Generated_Image_f0p71df0p71df0p7.png" />
     <None Remove="image-removebg-preview.png" />
     <None Remove="Images\default_avatar.png" />
+    <None Remove="Views\image-removebg-preview.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,7 @@
     <Resource Include="Images\default_avatar.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Views\image-removebg-preview.png" />
   </ItemGroup>
 
   <ItemGroup>

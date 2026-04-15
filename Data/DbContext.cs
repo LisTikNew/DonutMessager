@@ -5,17 +5,20 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
-namespace DonutMessager
+public class AppDbContext : DbContext
 {
-    public class AppDbContext : DbContext
+    public AppDbContext()
     {
-        internal DbSet<User> Users { get; set; }
-        internal DbSet<Contact> Contacts { get; set; }
-        public DbSet<Message> Messages { get; set; }
+        Database.EnsureCreated(); // Команда внутри конструктора!
+    }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=Maoam901157; Database=DonutMessager");
-        }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Message> Messages { get; set; }
+    internal DbSet<Contact> Contacts { get; set; }
+
+
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=Maoam901157;Database=DonutMessager");
     }
 }

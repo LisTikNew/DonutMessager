@@ -1,7 +1,6 @@
 ﻿using DonutMessager;
 using DonutMessager.Helpers;
 using DonutMessager.Models;
-using DonutMessenger.Client.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.ObjectModel;
@@ -12,191 +11,125 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using DonutMessager.Views;
+using System.Windows.Threading;
 
 namespace DonutMessager.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        // -----------------------------
-        //  PROPERTIES
-        // -----------------------------
-
+        private DispatcherTimer _updateTimer;
         private User _currentUser;
-        public User CurrentUser
-        {
-            get => _currentUser;
-            set { _currentUser = value; OnPropertyChanged(); }
-        }
+        private ChatModel _selectedChat;
+        private string _messageText;
+        private string _searchText;
+        private bool _isTyping;
 
+        public bool IsChatSelected => SelectedChat != null;
+        public User CurrentUser { get => _currentUser; set { _currentUser = value; OnPropertyChanged(); } }
         public ObservableCollection<ChatModel> Chats { get; set; } = new();
         public ObservableCollection<MessageModel> Messages { get; set; } = new();
+        public ObservableCollection<User> FoundUsers { get; set; } = new();
 
-        private ChatModel _selectedChat;
         public ChatModel SelectedChat
         {
             get => _selectedChat;
             set
             {
-                if (_selectedChat != value)
-                {
-                    _selectedChat = value;
-                    OnPropertyChanged();
-
-                    LoadChatMessages();
-                    JoinChatRoom();
-                }
+                _selectedChat = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsChatSelected));
+                Messages.Clear();
+                LoadChatMessages();
             }
         }
 
-        private string _messageText;
-        public string MessageText
+        public string MessageText { get => _messageText; set { _messageText = value; OnPropertyChanged(); } }
+        public string SearchText
         {
-            get => _messageText;
-            set { _messageText = value; OnPropertyChanged(); }
-        }
-
-        private bool _isTyping;
-        public bool IsTyping
-        {
-            get => _isTyping;
-            set { _isTyping = value; OnPropertyChanged(); }
+            get => _searchText;
+            set { _searchText = value; OnPropertyChanged(); SearchUsersInRealTime(); }
         }
 
         public ICommand SendMessageCommand { get; }
-
-        private readonly SignalRService _signalR;
-
-        // -----------------------------
-        //  CONSTRUCTOR
-        // -----------------------------
+        public ICommand SelectFoundUserCommand { get; }
 
         public MainViewModel(User user)
         {
             CurrentUser = user;
-            if (CurrentUser == null)
-                MessageBox.Show("CurrentUser == null");
+            MessageModel.CurrentUserId = user.Id;
 
-            MessageModel.CurrentUserId = CurrentUser.Id;
+            // Инициализация команд
+            SendMessageCommand = new RelayCommand(async _ => await SendMessage(), _ => SelectedChat != null);
+            SelectFoundUserCommand = new RelayCommand(obj => SelectFoundUser(obj as User));
 
-            SendMessageCommand = new RelayCommand(async _ => await SendMessage());
-
-            _signalR = new SignalRService("http://localhost:5227");
-            InitializeSignalR();
+            // Таймер обновления
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            _updateTimer.Tick += (s, e) => { LoadChats(); LoadChatMessages(); };
+            _updateTimer.Start();
 
             LoadChats();
         }
 
-        // -----------------------------
-        //  SIGNALR
-        // -----------------------------
-
-        private async void InitializeSignalR()
+        private void SelectFoundUser(User user)
         {
-            await _signalR.StartAsync();
+            if (user == null) return;
 
-            _signalR.Connection.On("ReceiveMessage",
-                (int chatId, int senderId, string text, DateTime timestamp) =>
-                {
-                    if (SelectedChat != null && SelectedChat.Id == chatId)
-                    {
-                        App.Current.Dispatcher.Invoke(() =>
-                        {
-                            Messages.Add(new MessageModel
-                            {
-                                ChatId = chatId,
-                                SenderId = senderId,
-                                Text = text,
-                                Timestamp = timestamp,
-                                SenderAvatar = GetAvatar(senderId)
-                            });
-                        });
-                    }
-                });
-        }
+            var existingChat = Chats.FirstOrDefault(c => c.UserId == user.Id);
 
-        // -----------------------------
-        //  LOAD CHATS
-        // -----------------------------
-
-        private void LoadChats()
-        {
-            Chats.Clear();
-
-            // Заглушки — заменишь на реальные чаты
-            Chats.Add(new ChatModel { Id = 1, Title = "Test chat", UserId = 2, AvatarUrl = "/Images/default_avatar.png" });
-            Chats.Add(new ChatModel { Id = 2, Title = "Another chat", UserId = 3, AvatarUrl = "/Images/default_avatar.png" });
-        }
-
-        // -----------------------------
-        //  LOAD MESSAGES
-        // -----------------------------
-
-        private void LoadChatMessages()
-        {
-            if (SelectedChat == null)
-                return;
-
-            Messages.Clear();
-
-            using var db = new AppDbContext();
-
-            var msgs = db.Messages
-                .Where(m => m.ChatId == SelectedChat.Id)
-                .OrderBy(m => m.Timestamp)
-                .ToList();
-
-            foreach (var m in msgs)
+            if (existingChat != null)
             {
-                Messages.Add(new MessageModel
-                {
-                    ChatId = m.ChatId,
-                    SenderId = m.SenderId,
-                    Text = m.Text,
-                    Timestamp = m.Timestamp,
-                    SenderAvatar = GetAvatar(m.SenderId)
-                });
+                SelectedChat = existingChat;
             }
+            else
+            {
+                var newChat = new ChatModel
+                {
+                    UserId = user.Id,
+                    Title = user.Username,
+                    AvatarUrl = user.AvatarPath ?? "/Images/default_avatar.png"
+                };
+                Chats.Insert(0, newChat);
+                SelectedChat = newChat; // После этой строки Grid должен стать Visible
+            }
+
+            SearchText = "";
+            FoundUsers.Clear();
         }
 
-        // -----------------------------
-        //  JOIN CHAT ROOM
-        // -----------------------------
-
-        private async void JoinChatRoom()
+        private void SearchUsersInRealTime()
         {
-            if (SelectedChat != null)
-                await _signalR.JoinChat(SelectedChat.Id);
-        }
+            FoundUsers.Clear();
+            if (string.IsNullOrWhiteSpace(SearchText)) return;
 
-        // -----------------------------
-        //  SEND MESSAGE
-        // -----------------------------
+            string query = SearchText.TrimStart('@').ToLower();
+            using var db = new AppDbContext();
+            var matches = db.Users
+                .Where(u => u.Username.ToLower().StartsWith(query) && u.Id != CurrentUser.Id)
+                .Take(5).ToList();
+
+            foreach (var u in matches) FoundUsers.Add(u);
+        }
 
         private async Task SendMessage()
         {
-            if (string.IsNullOrWhiteSpace(MessageText))
-                return;
+            if (string.IsNullOrWhiteSpace(MessageText) || SelectedChat == null) return;
 
-            if (SelectedChat == null)
-                return;
-
+            using var db = new AppDbContext();
             var msg = new Message
             {
-                ChatId = SelectedChat.Id,
                 SenderId = CurrentUser.Id,
+                ReceiverId = SelectedChat.UserId,
                 Text = MessageText,
                 Timestamp = DateTime.UtcNow
             };
 
-            using var db = new AppDbContext();
             db.Messages.Add(msg);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             Messages.Add(new MessageModel
             {
-                ChatId = msg.ChatId,
-                SenderId = msg.SenderId,
-                Text = msg.Text,
+                Text = MessageText,
+                SenderId = CurrentUser.Id,
                 Timestamp = msg.Timestamp,
                 SenderAvatar = CurrentUser.AvatarPath
             });
@@ -204,15 +137,54 @@ namespace DonutMessager.ViewModels
             MessageText = "";
         }
 
-        // -----------------------------
-        //  HELPERS
-        // -----------------------------
+        private void LoadChats()
+        {
+            using var db = new AppDbContext();
+            var interactorIds = db.Messages
+                .Where(m => m.SenderId == CurrentUser.Id || m.ReceiverId == CurrentUser.Id)
+                .Select(m => m.SenderId == CurrentUser.Id ? m.ReceiverId : m.SenderId)
+                .Distinct().ToList();
+
+            foreach (var id in interactorIds)
+            {
+                if (Chats.Any(c => c.UserId == id)) continue;
+                var contact = db.Users.Find(id);
+                if (contact != null)
+                {
+                    Chats.Add(new ChatModel { UserId = contact.Id, Title = contact.Username, AvatarUrl = contact.AvatarPath ?? "/Images/default_avatar.png" });
+                }
+            }
+        }
+
+        private void LoadChatMessages()
+        {
+            if (SelectedChat == null) return;
+            using var db = new AppDbContext();
+
+            var history = db.Messages
+                .Where(m => (m.SenderId == CurrentUser.Id && m.ReceiverId == SelectedChat.UserId) ||
+                            (m.SenderId == SelectedChat.UserId && m.ReceiverId == CurrentUser.Id))
+                .OrderBy(m => m.Timestamp).ToList();
+
+            if (history.Count == Messages.Count) return;
+
+            var newMessages = history.Skip(Messages.Count);
+            foreach (var m in newMessages)
+            {
+                Messages.Add(new MessageModel
+                {
+                    Text = m.Text,
+                    SenderId = m.SenderId,
+                    Timestamp = m.Timestamp,
+                    SenderAvatar = GetAvatar(m.SenderId)
+                });
+            }
+        }
 
         private string GetAvatar(int userId)
         {
             using var db = new AppDbContext();
-            return db.Users.FirstOrDefault(u => u.Id == userId)?.AvatarPath
-                   ?? "/Images/default_avatar.png";
+            return db.Users.Find(userId)?.AvatarPath ?? "/Images/default_avatar.png";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

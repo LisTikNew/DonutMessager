@@ -3,204 +3,146 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:DonutMessager.Converters"
         xmlns:conv="clr-namespace:DonutMessager.Converters"
-        Title="Donut Messenger" MinWidth="900"
-    MinHeight="600"
-    Width="1000"
-    Height="700"
-    SizeToContent="Manual"
-    WindowStartupLocation="CenterScreen">
-
-
+        Title="Donut Messenger" 
+        MinWidth="900" MinHeight="600"
+        Width="1000" Height="700"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <local:InverseBooleanToVisibilityConverter x:Key="BoolToVisibilityInverse"/>
         <conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
-        <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <conv:NotNullToCollapsedConverter x:Key="NotNullToCollapsedConverter"/>
     </Window.Resources>
 
-
     <Grid>
-
-        <!-- 🖼️ Твой фон -->
         <Grid.Background>
-            <ImageBrush ImageSource="/Gemini_Generated_Image_f0p71df0p71df0p7.png"
-                        Stretch="UniformToFill"
-                        Opacity="1"/>
+            <ImageBrush ImageSource="/Gemini_Generated_Image_f0p71df0p71df0p7.png" Stretch="UniformToFill" TileMode="Tile"/>
         </Grid.Background>
 
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
-
-
-        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
-
-
-
-        <!-- 🟦 ЛЕВАЯ ПАНЕЛЬ -->
-        <Border Background="#FF100F0F" Opacity="0.85" BorderBrush="#333" BorderThickness="0,0,1,0">
-            <Grid Background="#1E1E1E">
-
+        <Border Background="#CC100F0F" BorderBrush="#333" BorderThickness="0,0,1,0">
+            <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Список чатов -->
-                <ListBox Grid.Row="0"
-             ItemsSource="{Binding Chats}"
-             SelectedItem="{Binding SelectedChat}"
-             Background="Transparent"
-             BorderThickness="0"
-             Foreground="White"
-             Margin="5">
+                <StackPanel Grid.Row="0" Margin="10,10,10,5">
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Tag="Поиск по @username..." Height="35" 
+                     VerticalContentAlignment="Center" Padding="10,0"
+                     Background="#44000000" Foreground="White" BorderBrush="#555"/>
 
+                    <ListBox ItemsSource="{Binding FoundUsers}" 
+                     Visibility="{Binding FoundUsers.Count, Converter={StaticResource CountToVisibilityConverter}}"
+                     Background="#592D2D2D" MaxHeight="180" Margin="0,5,0,0" 
+                     BorderThickness="0" BorderBrush="#FFABADB3">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="8" Cursor="Hand" Background="Transparent">
+                                    <Border.InputBindings>
+                                        <MouseBinding MouseAction="LeftClick" 
+                                              Command="{Binding DataContext.SelectFoundUserCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                              CommandParameter="{Binding}"/>
+                                    </Border.InputBindings>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="25" Height="25" Fill="DeepPink" Margin="0,0,10,0"/>
+                                        <TextBlock Text="{Binding Username}" Foreground="White" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding Chats}" SelectedItem="{Binding SelectedChat}"
+                 Background="Transparent" BorderThickness="0" Margin="0,5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <Border Width="40" Height="40"
-                            CornerRadius="20"
-                            ClipToBounds="True"
-                            Margin="0,0,10,0">
-                                    <Image Source="{Binding AvatarUrl}"
-                               Stretch="UniformToFill"/>
-                                </Border>
-
-                                <TextBlock Text="{Binding Title}"
-                               VerticalAlignment="Center"
-                               FontSize="16"
-                               Foreground="White"/>
-                            </StackPanel>
+                            <Border Padding="10" Background="Transparent">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="45" Height="45" CornerRadius="22.5" ClipToBounds="True" Margin="0,0,12,0">
+                                        <Image Source="{Binding AvatarUrl}" Stretch="UniformToFill"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding Title}" Foreground="White" FontSize="15" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
-
                 </ListBox>
 
-                <!-- Профиль текущего пользователя -->
-                <Border Grid.Row="1"
-        Background="#262626"
-        Padding="10"
-        BorderThickness="0,1,0,0"
-        BorderBrush="#333">
-
+                <Border Grid.Row="2" Background="#44000000" Padding="12" BorderThickness="0,1,0,0" BorderBrush="#333">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Левая часть: аватар + имя -->
-                        <StackPanel Orientation="Horizontal"
-                    Grid.Column="0">
-                            <!-- Аватарка -->
-                            <Border Width="48" Height="48"
-                    CornerRadius="24"
-                    ClipToBounds="True"
-                    Margin="0,0,10,0">
-                                <Image Source="{Binding CurrentUser.AvatarPath}"
-                       Stretch="UniformToFill"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="40" Height="40" CornerRadius="20" ClipToBounds="True" Margin="0,0,10,0">
+                                <Image Source="{Binding CurrentUser.AvatarPath}" Stretch="UniformToFill"/>
                             </Border>
-
-                            <!-- Имя -->
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="{Binding CurrentUser.Name}"
-                           FontSize="16"
-                           FontWeight="Bold"
-                           Foreground="White"/>
-
-                                <TextBlock Text="Online"
-                           FontSize="12"
-                           Foreground="#88FFFFFF"/>
+                                <TextBlock Text="{Binding CurrentUser.Name}" Foreground="White" FontWeight="Bold"/>
+                                <TextBlock Text="Online" Foreground="#88FFFFFF" FontSize="11"/>
                             </StackPanel>
                         </StackPanel>
-
-                        <!-- Правая часть: кнопка Settings -->
-                        <Button Grid.Column="1"
-                Content="⚙"
-                Width="32"
-                Height="32"
-                Margin="10,0,0,0"
-                Foreground="White"
-                BorderBrush="#555"
-                BorderThickness="1"
-                Cursor="Hand"
-                Click="OpenSettings_Click" Background="#00DDDDDD"/>
+                        <Button HorizontalAlignment="Right" Content="⚙" Width="30" Height="30" 
+                        Click="OpenSettings_Click" Background="Transparent" Foreground="White" 
+                        BorderThickness="0" Cursor="Hand" FontSize="18"/>
                     </Grid>
-
                 </Border>
             </Grid>
         </Border>
 
-
-
-        <!-- 🟩 ПРАВАЯ ПАНЕЛЬ -->
         <Grid Grid.Column="1">
-            <Rectangle Stretch="Fill"
-               RadiusX="10"
-               RadiusY="10">
-                <Rectangle.Fill>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="Black"/>
-                        <GradientStop Color="#FF6D4468" Offset="1"/>
-                        <GradientStop Color="#D6332130" Offset="0.777"/>
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <Grid Panel.ZIndex="1" Visibility="{Binding SelectedChat, Converter={StaticResource NullToVisibilityConverter}}">
+                <Label Content="Pick one to chat with!" 
+           Background="#CC000000" 
+           Foreground="White" 
+           FontSize="24" 
+           FontFamily="Arial Black"
+           HorizontalContentAlignment="Center" 
+           VerticalContentAlignment="Center"
+           
+           HorizontalAlignment="Stretch" 
+           VerticalAlignment="Center" 
+           Height="60">
+                    <Label.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Label.RenderTransform>
+                </Label>
+            </Grid>
 
-            <TextBlock Text="Pick one to chat with!"
-               FontFamily="Arial Black"
-               FontSize="32"
-               Foreground="Gray"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               Visibility="{Binding SelectedChat, Converter={StaticResource NullToVisibilityConverter}}"/>
-
-
-            <Grid Margin="10"
-          Visibility="{Binding SelectedChat, Converter={StaticResource NotNullToCollapsedConverter}}">
-
+            <Grid Margin="15">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="53"/>
-                    <!-- Input -->
-                    <!-- Header -->
-                    <RowDefinition Height="*"/>
-                    <!-- Messages -->
                     <RowDefinition Height="60"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="65"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <Border Grid.Row="0" Opacity="0.85" CornerRadius="4,4,0,0" Padding="10" Margin="-7,0,-7,0">
-                    <Border.Background>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="Black" Offset="1"/>
-                            <GradientStop Color="#FF9E6196" Offset="0"/>
-                            <GradientStop Color="#D6482F45" Offset="0.358"/>
-                        </LinearGradientBrush>
-                    </Border.Background>
+                <Border Grid.Row="0" CornerRadius="12" Padding="10" Background="#67000000" BorderThickness="1" BorderBrush="#33FFFFFF">
                     <StackPanel Orientation="Horizontal">
-                        <Ellipse Width="32" Height="32" Fill="#444"/>
-                        <StackPanel Margin="0,-2,0,0">
-                            <!-- Имя собеседника -->
-                            <TextBlock Text="{Binding SelectedChat.Title}"
-               Foreground="White"
-               FontSize="16"
-               FontWeight="Bold"/>
-
-                            <!-- Статус: Online / typing... -->
-                            <TextBlock FontSize="12"
-               Foreground="#88FFFFFF">
+                        <Ellipse Width="40" Height="39" Fill="#555" Margin="0,0,12,0"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding SelectedChat.Title}" Foreground="White" FontWeight="Bold" FontSize="17"/>
+                            <TextBlock FontSize="12">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Text" Value="Online"/>
+                                        <Setter Property="Foreground" Value="#88FFFFFF"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsTyping}" Value="True">
                                                 <Setter Property="Text" Value="typing..."/>
+                                                <Setter Property="Foreground" Value="Pink"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -210,123 +152,59 @@
                     </StackPanel>
                 </Border>
 
+                <ScrollViewer Grid.Row="1" x:Name="ChatScroll" VerticalScrollBarVisibility="Auto" Margin="0,10">
+                    <ItemsControl ItemsSource="{Binding Messages}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-
-                <!-- Messages -->
-                <Border Opacity="0.85"
-        CornerRadius="0,0,4,4"
-        Padding="10"
-        Grid.Row="1"
-        Margin="0,6,0,0">
-                    
-                    
-
-
-                    <!-- убрали 59 -->
-                    <ScrollViewer x:Name="ChatScroll" VerticalScrollBarVisibility="Auto" Margin="-10,-10,-10,-10">
-                        <ItemsControl ItemsSource="{Binding Messages}" Width="736">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <!-- Чужое сообщение (слева, с аватаром) -->
-                                        <StackPanel Grid.Column="0"
-                        Orientation="Horizontal"
-                        Margin="0,0,40,0"
-                        Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibilityInverse}}">
-
-                                            <!-- Аватар -->
-                                            <Ellipse Width="32" Height="32">
-                                                <Ellipse.Fill>
-                                                    <ImageBrush ImageSource="{Binding SenderAvatar, TargetNullValue=/Images/default_avatar.png}"/>
-                                                </Ellipse.Fill>
-                                            </Ellipse>
-
-                                            <!-- Пузырёк -->
-                                            <Border Background="#FFFFFF"
-                        CornerRadius="10,10,10,0"
-                        Padding="10"
-                        MaxWidth="350"
-                        Opacity="0.9">
-                                                <TextBlock Text="{Binding Text}"
-                               Foreground="Black"
-                               TextWrapping="Wrap"/>
-                                            </Border>
-                                        </StackPanel>
-
-                                        <!-- Моё сообщение (справа, без аватара) -->
-                                        <Border Grid.Column="1"
-                    Background="#4CAF50"
-                    CornerRadius="10,10,0,10"
-                    Padding="10"
-                    MaxWidth="350"
-                    Margin="40,0,0,0"
-                    Opacity="0.9"
-                    HorizontalAlignment="Right"
-                    Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibility}}">
-                                            <TextBlock Text="{Binding Text}"
-                           Foreground="White"
-                           TextWrapping="Wrap"/>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left"
+                                                Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibilityInverse}}">
+                                        <Ellipse Width="32" Height="32" Margin="0,0,8,0" VerticalAlignment="Bottom">
+                                            <Ellipse.Fill>
+                                                <ImageBrush ImageSource="{Binding SenderAvatar, TargetNullValue='/Images/default_avatar.png'}"/>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
+                                        <Border Background="#EEE" CornerRadius="15,15,15,2" Padding="12" MaxWidth="350">
+                                            <TextBlock Text="{Binding Text}" Foreground="#222" TextWrapping="Wrap" FontSize="14"/>
                                         </Border>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
+                                    </StackPanel>
 
-                </Border>
+                                    <Border Grid.Column="1" Background="#FF7A2691" CornerRadius="15,15,2,15" 
+                                            Padding="12" MaxWidth="350" HorizontalAlignment="Right"
+                                            Visibility="{Binding IsMine, Converter={StaticResource BoolToVisibility}}">
+                                        <TextBlock Text="{Binding Text}" Foreground="White" TextWrapping="Wrap" FontSize="14"/>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
 
-                <!-- Input -->
-                <Grid Grid.Row="2" Margin="0,10,0,0">
-                    <!-- Фон под всей панелью -->
-                    <Rectangle Fill="#D30E0E0E"
-               RadiusX="10"
-               RadiusY="10"
-               Stroke="#FFF87DFF"
-               Height="45"
-               VerticalAlignment="Center"/>
-
-                    <!-- Фон под кнопкой -->
-                    <Rectangle Fill="#D8B573C1"
-               RadiusX="50"
-               RadiusY="50"
-               Width="40"
-               Height="40"
-               HorizontalAlignment="Right"
-               Margin="0,0,2,0"
-               VerticalAlignment="Center"/>
-
-                    <!-- Содержимое -->
-                    <Grid Margin="4,0,10,0">
+                <Grid Grid.Row="2" VerticalAlignment="Bottom" Margin="0,0,0,5">
+                    <Border Background="#AA000000" CornerRadius="25" BorderBrush="#FFF87DFF" BorderThickness="1.5" Height="50"/>
+                    <Grid Margin="20,0,10,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
+                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        
-                        <TextBox Grid.Column="0"
-                 Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
-                 Foreground="White"
-                 BorderBrush="#00CCCCCC"
-                 FontSize="14"
-                 Padding="10"
-                 Height="42"
-                 Background="Transparent"
-                 SelectionBrush="#00000000"
-                 SelectionTextBrush="#FFFFCAFB" Grid.ColumnSpan="2" Margin="-5,4,39,4"/>
+                        <TextBox Grid.Column="0" 
+         Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}"
+         Foreground="White" Background="Transparent" BorderThickness="0"
+         VerticalContentAlignment="Center" FontSize="15" CaretBrush="White">
 
-                        <Button Grid.Column="1"
-                Width="34"
-                Height="34"
-                Margin="20,0,-5,0"
-                Command="{Binding SendMessageCommand}" BorderBrush="{x:Null}">
-                            <Button.Background>
-                                <ImageBrush ImageSource="/Gemini_Generated_Image_creu5ycreu5ycreu-removebg-preview.png"
-                            Stretch="UniformToFill"/>
-                            </Button.Background>
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding SendMessageCommand}"/>
+                            </TextBox.InputBindings>
+
+                        </TextBox>
+                        <Button Grid.Column="1" Command="{Binding SendMessageCommand}" 
+                                Width="40" Height="40" Background="{x:Null}" BorderThickness="0" Cursor="Hand">
+                            <Image Source="/Views/image-removebg-preview.png" Stretch="Uniform" Opacity="0.9"/>
                         </Button>
                     </Grid>
                 </Grid>

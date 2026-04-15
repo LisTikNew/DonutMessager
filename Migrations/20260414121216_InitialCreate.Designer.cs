@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DonutMessager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260411214958_AddUserOnlineFields")]
-    partial class AddUserOnlineFields
+    [Migration("20260414121216_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,9 @@ namespace DonutMessager.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("integer");
